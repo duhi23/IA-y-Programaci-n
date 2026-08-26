@@ -1,0 +1,60 @@
+/* Estilos ligeros para el material del módulo */
+
+.motivacion {
+  background-color: #fff8e6;
+  border-left: 5px solid #f0ad4e;
+  padding: 0.9em 1.2em;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+}
+
+.teoria {
+  background-color: #eef4fb;
+  border-left: 5px solid #3b7dd8;
+  padding: 0.9em 1.2em;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+}
+
+.ejercicio-resuelto {
+  background-color: #eefaf0;
+  border-left: 5px solid #2fa84f;
+  padding: 0.9em 1.2em;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+}
+
+.ejercicio-propuesto {
+  background-color: #fdecec;
+  border-left: 5px solid #d9534f;
+  padding: 0.9em 1.2em;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+}
+
+.callout-objetivo {
+  font-weight: 600;
+}
+
+/* Ancho de la barra lateral de la tabla de contenidos */
+#quarto-sidebar {
+  width: 250px !important;
+}
+
+/* Tamaño de letra para los elementos de la lista */
+#quarto-toc-target ul li a {
+  font-size: 0.8rem !important;
+}
+
+.callout-morado {
+            background-color: #f3ebf9;       /* Fondo violeta/morado claro */
+            border-left: 5px solid #6f42c1;  /* Borde izquierdo morado */
+            padding: 0.9em 1.2em;
+            border-radius: 6px;
+            margin-bottom: 1.2em;
+          }
+.callout-morado h3, 
+          .callout-morado strong {
+            color: #5a2d91;
+            margin-top: 0;
+          }
