@@ -4,9 +4,12 @@ subtitle: "IA y Programación"
 lang: es
 author: "Diego Huaraca"
 date: last-modified
-format:
-  html:
+format: 
+  live-html:
+    css: styles.css
     toc: true
+    toc-title: "Contenidos" 
+    toc-depth: 3
     toc-location: left
     include-in-header:
       text: |
@@ -218,11 +221,14 @@ GitHub es una plataforma de desarrollo colaborativo basada en la nube que utiliz
    git branch -M main
    git push -u origin main
    ```
+
 6. En Positron, el panel **Source Control** (ícono de rama en la barra
    lateral) permite hacer `stage`, `commit` y `push`/`pull` sin usar la
    terminal, si lo prefieres.
+   
 
 Flujo básico que usarás a lo largo de todo el curso si optas por usar GitHub para el control de versiones:
+![Flujo básico](imgs/pull.png){.column-margin width=250px}
 
   ```bash
   git pull           # Traer los últimos cambios
@@ -232,7 +238,13 @@ Flujo básico que usarás a lo largo de todo el curso si optas por usar GitHub p
   git push           # Envías los cambios al repositorio
   ```
 
-![Flujo básico](imgs/pull.png){.column-margin width=250px}
+:::{.callout-morado .column-margin}
+💡 **Tip:** Si prefieres enviar el 100% de los archivos de tu versión local:
+
+git push -u origin main --force
+:::
+
+[Guía Rápida de Git](./docs/git-cheat-sheet-education.pdf)
 
 ## Estructuras de datos
 
@@ -432,14 +444,15 @@ datos[(datos["edad"] <= 25) & (datos["promedio"] > 8.2)]  # filtrado de filas
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 1
 
-**Enunciado:** Crea un vector/lista con las temperaturas (°C) registradas
-en una semana: 18, 20, 19, 22, 21, 17, 16. Calcula la temperatura promedio y
-cuántos días tuvieron más de 19°C.
+**Ejemplo 1:** Crea un vector/lista con las temperaturas (°C) registradas
+en una semana en la ciudad de Quito: 18, 20, 19, 22, 21, 17, 16. Se pide:
 
-**Solución razonada:** Primero almacenamos los datos en la estructura
-homogénea correspondiente de cada lenguaje, luego aplicamos una función de
+  a. Calcular la temperatura promedio, y
+  b. Cuántos días en la semana las temperaturas superaron los 19°C ?.
+
+**Solución razonada:** Primero se almacenan los datos en una estructura
+homogénea correspondiente de cada lenguaje, luego se aplica una función de
 agregación para el promedio y una condición lógica para contar los días
 que cumplen el criterio.
 
@@ -475,18 +488,20 @@ print("Días con más de 19°C:", dias_calurosos)
 ```
 :::
 
-**Interpretación del resultado:** El operador de comparación (`> 19`)
+**Nota:** El operador de comparación (`> 19`)
 aplicado a toda la estructura genera un vector/array lógico, y `sum()`
 cuenta los `TRUE`/`True`, aprovechando que en ambos lenguajes `TRUE`/`True`
 se trata como `1` al sumarse.
 :::
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 2
 
-**Enunciado:** Construye un dataframe con 4 productos, su precio y la
-cantidad vendida. Agrega una columna "ingreso" = precio × cantidad y muestra
-solo los productos con ingreso mayor a 100.
+**Ejemplo 2:** Construya un dataframe con 4 productos, su precio y la
+cantidad vendida. Se pide:
+
+  a. Agregar una columna "ingreso" = precio × cantidad
+  b. Mostrar solo los productos con ingreso mayor a 100.
+  c. Calcular el total de productos disponibles con un precio inferior a 1 usd.
 
 ::: {.panel-tabset}
 ## R
@@ -495,13 +510,20 @@ solo los productos con ingreso mayor a 100.
 #| label: resuelto2-r
 
 productos <- data.frame(
-  producto = c("Cuaderno", "Lápiz", "Mochila", "Borrador"),
-  precio = c(2.5, 0.5, 25, 0.8),
-  cantidad = c(40, 100, 5, 60)
+  producto = c("Cuaderno", "Lápiz", "Mochila", "Borrador", "Goma", "Regla"),
+  precio = c(2.5, 0.5, 38, 0.6, 1.4, 0.3),
+  cantidad = c(52, 100, 7, 60, 70, 25)
 )
-
+# Data Frame creado
+productos
+# Nueva columna "ingreso" calculada a partir de las columnas existentes
 productos$ingreso <- productos$precio * productos$cantidad
+# Data Frame actualizado con la nueva columna
+productos
+# Filtro de productos con ingreso mayor a 100
 productos[productos$ingreso > 100, ]
+# Productos con precio inferior a 1 usd
+sum(productos[productos$precio < 1,]$cantidad)
 ```
 
 ## Python
@@ -512,70 +534,115 @@ productos[productos$ingreso > 100, ]
 import pandas as pd
 
 productos = pd.DataFrame({
-    "producto": ["Cuaderno", "Lápiz", "Mochila", "Borrador"],
-    "precio": [2.5, 0.5, 25, 0.8],
-    "cantidad": [40, 100, 5, 60]
+    "producto": ["Cuaderno", "Lápiz", "Mochila", "Borrador", "Goma", "Regla"],
+    "precio": [2.5, 0.5, 38, 0.6, 1.4, 0.3],
+    "cantidad": [52, 100, 7, 60, 70, 25]
 })
-
+# Data Frame creado
+productos
+# Nueva columna "ingreso" calculada a partir de las columnas existentes
 productos["ingreso"] = productos["precio"] * productos["cantidad"]
+# Data Frame actualizado con la nueva columna
+productos
+# Filtro de productos con ingreso mayor a 100
 productos[productos["ingreso"] > 100]
+# Productos con precio inferior a 1 usd
+print(productos[productos["precio"] < 1]["cantidad"].sum())
 ```
 :::
 
-**Interpretación del resultado:** Crear una columna nueva a partir de
-columnas existentes es una operación vectorizada en ambos lenguajes: la
-multiplicación se aplica fila por fila sin necesidad de un bucle explícito.
+**Nota:** Crear una columna nueva a partir de columnas existentes es una 
+operación vectorizada en ambos lenguajes: la multiplicación se aplica fila 
+por fila sin necesidad de un bucle explícito.
 :::
 
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 1
 
-Crea un vector/array con las edades de 8 personas de tu elección. Calcula la
-edad máxima, mínima y la desviación estándar.
+**Ejercicio 1:** Crea un vector/array con las edades de 8 personas de tu elección. 
+
+Calcular la edad máxima, mínima y la desviación estándar.
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto1-r
-#| eval: false
-
-# Completa aquí tu solución en R
+```{webr}
+#| exercise: ex_1
+# Completa la solución en R
+edades <- c(____)
+# Edad máxima
+maxima <- ____
+# Edad mínima
+minima <- ____
+# Desviación estándar
+desviacion <- ____
+# Impresión de resultados
+cat("Máx: ", maxima, "Mín: ", minima, "Std: ", desviacion)
 ```
 
 ## Python
-```{python}
-#| label: propuesto1-py
-#| eval: false
-
-# Completa aquí tu solución en Python
+```{pyodide-python}
+#| exercise: ex_1
+import numpy as np
+# Completa la solución en Python
+edades = np.array([____])
+# Edad máxima
+maxima = ____
+# Edad mínima
+minima = ____
+# Desviación estándar
+desviacion = ____
+# Impresión de resultados
+print(f"Máx: {maxima}, Mín: {minima}, Std: {desviacion:.2f}")
 ```
 :::
 :::
+
+
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 2
 
-Construye un dataframe con al menos 5 estudiantes, sus tres notas parciales
-y calcula una columna "promedio_final". Filtra a los estudiantes que
-aprueban (promedio ≥ 7).
+**Ejercicio 2:** Complete el dataframe de las notas de 5 estudiantes, sus tres notas parciales
+y calcule una columna "promedio_final". Se pide:
+
+  a. Filtrar a los estudiantes que aprueban (promedio_final >= 7)
+  b. Filtrar a los estudiantes cuya máxima nota parcial es inferior a 5 (reprobados).
+
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto2-r
-#| eval: false
-
-# Completa aquí tu solución en R
+```{webr}
+#| exercise: ex_2
+# Completa la solución en R
+estudiantes <- data.frame(
+      nombres = c("Luis", "Jaime", "David", "Ana", "María"),
+      nota1 = c(8,____),
+      nota2 = c(____),
+      nota3 = c(____))
+# Cálculo del promedio final
+estudiantes$promedio_final <- (____)/3
+# Filtrar a los estudiantes aprobados
+estudiantes[____]
+# Filtrar a los estudiantes reprobados
+estudiantes[____]
 ```
 
 ## Python
-```{python}
-#| label: propuesto2-py
-#| eval: false
-
-# Completa aquí tu solución en Python
+```{pyodide-python}
+#| exercise: ex_2
+import numpy as np
+# Completa la solución en Python
+estudiantes = pd.DataFrame({
+    "nombres": ["Luis", "Jaime", "David", "Ana", "María"],
+    "nota1": [8, ____],
+    "nota2": [____],
+    "nota3": [____]})
+# Cálculo del promedio final
+estudiantes["promedio_final"] = ____(axis=1)
+# Filtrar a los estudiantes aprobados
+estudiantes[____]
+# Filtrar a los estudiantes reprobados
+estudiantes[____]
 ```
 :::
 :::
@@ -583,10 +650,12 @@ aprueban (promedio ≥ 7).
 ## Sentencias condicionales
 
 ::: {.teoria}
-Las sentencias condicionales ejecutan un bloque de código solo si se cumple
-una condición lógica. La lógica es idéntica en ambos lenguajes; cambia la
-sintaxis.
+Las sentencias condicionales son estructuras fundamentales de control de flujo que permiten a un programa **evaluar expresiones lógicas y ejecutar bloques de código específicos** según el resultado sea verdadero o falso (`TRUE/FALSE` en R o `True/False` en Python). Mientras que Python destaca por su sintaxis limpia y minimalista basada en la sangría obligatoria (`if, elif, else`), R utiliza una estructura tradicional delimitada por llaves (`if, else if, else`) e integra potentes alternativas vectorizadas como `ifelse()` o `dplyr::case_when()`. Dominar estas herramientas en ambos lenguajes es esencial para implementar lógica de negocios, transformar variables en data frames y automatizar la toma de decisiones dentro de pipelines de análisis de datos o algoritmos de machine learning.
+
+La lógica es idéntica en ambos lenguajes; únicamente cambia la sintaxis.
 :::
+
+![Sentencia condicional](imgs/if.jpg){.column-margin width=250px}
 
 ::: {.panel-tabset}
 ## R
@@ -621,66 +690,89 @@ else:
 ```
 :::
 
-::: {.callout-objetivo}
-Nota clave: R usa llaves `{ }` para delimitar los bloques; Python usa
+:::{.callout-morado .column-margin}
+**Nota**: R usa llaves `{ }` para delimitar los bloques; Python usa
 **indentación** (habitualmente 4 espacios) — no son opcionales, definen
 dónde empieza y termina cada bloque.
 :::
 
-### Ejercicios resueltos
+### Operadores Lógicos
+
+::: {.teoria}
+Los operadores lógicos permiten combinar o invertir evaluadores booleanos. En Python, la sintaxis es **expresiva y basada en palabras clave en inglés** (`and, or, not`), las cuales realizan evaluación de operadores escalares y vectorizados. Por su parte, R **distingue estrictamente** entre operadores escalares (`&&, ||`), diseñados para evaluar condiciones de un solo elemento dentro de estructuras como `if()`, y operadores vectorizados (`&, |, !`), que efectúan comparaciones elemento por elemento a lo largo de vectores o columnas de data frames.
+:::
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 3
 
-**Enunciado:** Dado el IMC (índice de masa corporal) de una persona,
-clasifícalo como "Bajo peso" (<18.5), "Normal" (18.5–24.9), "Sobrepeso"
-(25–29.9) u "Obesidad" (≥30).
+**Ejemplo 3:** A continuación se presenta un conjunto de datos correspondiente al historial crediticio de 10 solicitantes de crédito en una institución financiera ecuatoriana. Se pide:
+
+  a. Agregar la columna "evaluación" que determine si la solicitud es "Aprobado" (si los ingresos son mayores o iguales a 1800 y el puntaje de crédito es mayor a 650) o "Rechazado" en caso contrario.
+  b. Agregar la columna "segmento_riesgo" utilizando las siguientes reglas:
+    - *Bajo*: si el puntaje es mayor a 750.
+    - *Medio*: si el puntaje está entre 600 y 750 (inclusive).
+    - *Alto*: si el puntaje es menor a 600.
+  c. Filtrar el data frame para mostrar únicamente los clientes cuyo segmento de riesgo sea "Alto" o hayan sido "Rechazado".
 
 ::: {.panel-tabset}
 ## R
 
 ```{r}
 #| label: resuelto3-r
-
-imc <- 27.3
-
-if (imc < 18.5) {
-  categoria <- "Bajo peso"
-} else if (imc < 25) {
-  categoria <- "Normal"
-} else if (imc < 30) {
-  categoria <- "Sobrepeso"
-} else {
-  categoria <- "Obesidad"
-}
-
-cat("Categoría:", categoria, "\n")
+creditos <- data.frame(
+  cliente = paste0("C", 1:10),
+  edad = c(25, 42, 31, 58, 22, 37, 49, 29, 61, 34),
+  ingresos = c(1200, 2500, 1900, 3100, 950, 2100, 1750, 1800, 4000, 1500),
+  puntaje = c(580, 720, 680, 790, 610, 760, 590, 640, 810, 550)
+)
+# Solicitudes de crédito
+creditos
+# Creación de la columna "evaluación"
+creditos$evaluacion <- ifelse(creditos$ingresos >= 1800 & creditos$puntaje > 650, "Aprobado", "Rechazado")
+creditos
+# Creación de la columna "segmento_riesgo"
+creditos$segmento <- ifelse(creditos$puntaje > 750, "Bajo",
+                                   ifelse(creditos$puntaje >= 600, "Medio", "Alto"))
+creditos
+# Filtrado de clientes con segmento de riesgo "Alto" o ha sido "Rechazado"
+creditos[creditos$segmento == "Alto" | creditos$evaluacion == "Rechazado", ]
 ```
 
 ## Python
 
 ```{python}
 #| label: resuelto3-py
+import numpy as np
+import pandas as pd
 
-imc = 27.3
-
-if imc < 18.5:
-    categoria = "Bajo peso"
-elif imc < 25:
-    categoria = "Normal"
-elif imc < 30:
-    categoria = "Sobrepeso"
-else:
-    categoria = "Obesidad"
-
-print("Categoría:", categoria)
+creditos = pd.DataFrame({
+    "cliente": [f"C{i}" for i in range(1, 11)],
+    "edad": [25, 42, 31, 58, 22, 37, 49, 29, 61, 34],
+    "ingresos": [1200, 2500, 1900, 3100, 950, 2100, 1750, 1800, 4000, 1500],
+    "puntaje": [580, 720, 680, 790, 610, 760, 590, 640, 810, 550],
+})
+# Solicitudes de crédito
+print(creditos)
+# Creación de la columna "evaluacion" mediante np.where
+creditos["evaluacion"] = np.where(
+    (creditos["ingresos"] >= 1800) & (creditos["puntaje"] > 650),
+    "Aprobado", "Rechazado")
+print(creditos)
+# Creación de la columna "segmento" mediante np.select
+condiciones = [creditos["puntaje"] > 750, creditos["puntaje"] >= 600]
+opciones = ["Bajo", "Medio"]
+creditos["segmento"] = np.select(condiciones, opciones, default="Alto")
+print(creditos)
+# Filtrado de clientes con segmento de riesgo "Alto" o evaluación "Rechazado"
+resultado = creditos[
+    (creditos["segmento"] == "Alto") | (creditos["evaluacion"] == "Rechazado")
+]
+print(resultado)
 ```
 :::
 
-**Interpretación del resultado:** El orden de las comparaciones importa:
-como evaluamos de menor a mayor con `elif`/`else if`, basta con comparar
-el límite superior de cada rango.
+**Nota:** La función `ifelse()` permite evaluar condiciones lógicas elemento por elemento a lo largo de un vector o columna de un data frame, retornando un nuevo vector con la misma longitud que la entrada.
 :::
+
 
 ### Ejercicios propuestos
 
@@ -766,7 +858,7 @@ agregación directas).
 ## R
 
 ```{r}
-#| label: resuelto4-r
+#| label: resuelto5-r
 
 notas <- c(8, 5, 9, 6, 7, 4, 10)
 aprobados <- 0
@@ -783,7 +875,7 @@ cat("Aprobados:", aprobados, "\n")
 ## Python
 
 ```{python}
-#| label: resuelto4-py
+#| label: resuelto5-py
 
 notas = [8, 5, 9, 6, 7, 4, 10]
 aprobados = 0
@@ -890,7 +982,7 @@ devuelva un resumen con el mínimo, máximo y promedio.
 ## R
 
 ```{r}
-#| label: resuelto5-r
+#| label: resuelto6-r
 
 resumen_numerico <- function(x) {
   list(
@@ -906,7 +998,7 @@ resumen_numerico(c(4, 8, 15, 16, 23, 42))
 ## Python
 
 ```{python}
-#| label: resuelto5-py
+#| label: resuelto6-py
 
 def resumen_numerico(x):
     return {
@@ -1047,7 +1139,7 @@ CSV, y vuelve a leerlo para confirmar que se guardó correctamente.
 ## R
 
 ```{r}
-#| label: resuelto6-r
+#| label: resuelto7-r
 
 estudiantes <- data.frame(
   nombre = c("Ana", "Luis", "Marta"),
@@ -1062,7 +1154,7 @@ verificacion
 ## Python
 
 ```{python}
-#| label: resuelto6-py
+#| label: resuelto7-py
 
 import pandas as pd
 
@@ -1119,7 +1211,7 @@ nuevo archivo `.xlsx`.
 ::: {.panel-tabset}
 ## R
 ```{r}
-#| label: propuesto7-r
+#| label: propuesto8-r
 #| eval: false
 
 # Completa aquí tu solución en R
@@ -1127,7 +1219,7 @@ nuevo archivo `.xlsx`.
 
 ## Python
 ```{python}
-#| label: propuesto7-py
+#| label: propuesto8-py
 #| eval: false
 
 # Completa aquí tu solución en Python

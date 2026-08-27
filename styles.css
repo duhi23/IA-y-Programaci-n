@@ -46,15 +46,17 @@
   font-size: 0.8rem !important;
 }
 
-.callout-morado {
-            background-color: #f3ebf9;       /* Fondo violeta/morado claro */
-            border-left: 5px solid #6f42c1;  /* Borde izquierdo morado */
-            padding: 0.9em 1.2em;
-            border-radius: 6px;
-            margin-bottom: 1.2em;
-          }
-.callout-morado h3, 
-          .callout-morado strong {
-            color: #5a2d91;
-            margin-top: 0;
-          }
+
+.column-margin.callout-morado,
+.column-margin .callout-morado {
+  background-color: #f3ebf9 !important;
+  border-left: 5px solid #6f42c1 !important;
+  padding: 0.9em 1.2em !important;
+  border-radius: 6px;
+  margin-bottom: 1.2em;
+}
+
+.column-margin.callout-morado h3, 
+.column-margin.callout-morado strong {
+  color: #5a2d91;
+}
