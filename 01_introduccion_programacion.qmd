@@ -702,6 +702,8 @@ dónde empieza y termina cada bloque.
 Los operadores lógicos permiten combinar o invertir evaluadores booleanos. En Python, la sintaxis es **expresiva y basada en palabras clave en inglés** (`and, or, not`), las cuales realizan evaluación de operadores escalares y vectorizados. Por su parte, R **distingue estrictamente** entre operadores escalares (`&&, ||`), diseñados para evaluar condiciones de un solo elemento dentro de estructuras como `if()`, y operadores vectorizados (`&, |, !`), que efectúan comparaciones elemento por elemento a lo largo de vectores o columnas de data frames.
 :::
 
+### Ejercicios resueltos
+
 ::: {.ejercicio-resuelto}
 
 **Ejemplo 3:** A continuación se presenta un conjunto de datos correspondiente al historial crediticio de 10 solicitantes de crédito en una institución financiera ecuatoriana. Se pide:
@@ -773,30 +775,59 @@ print(resultado)
 **Nota:** La función `ifelse()` permite evaluar condiciones lógicas elemento por elemento a lo largo de un vector o columna de un data frame, retornando un nuevo vector con la misma longitud que la entrada.
 :::
 
-
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 3
+**Ejercicio 3:** Calcular el porcentaje de descuento asignado a una compra según el tipo de cliente (`VIP o Estándar`), el monto total y si el cliente cuenta con un cupón promocional activo.
 
-Dado un número entero, determina si es positivo, negativo o cero, y además
-si es par o impar (deberás combinar dos condicionales).
+  - **Descuento del 20%**: Si el cliente es VIP y el monto supera 150 dólares, o si cuenta con cupón promocional (`TRUE`).
+  - **Descuento del 10%**: Si el cliente es VIP pero el monto es menor o igual a 150 dólares, o si es cliente Estándar con un monto superior a 200 dólares.
+  - **Sin descuento (0%)**: En cualquier otro caso.
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto3-r
-#| eval: false
+```{webr}
+#| exercise: ex_3
+# Variables de entrada
+tipo_cliente <- "____"
+monto_compra <- ____
+tiene_cupon <- FALSE
 
-# Completa aquí tu solución en R
+# Evaluación de condicionales
+if ((____ && ____) || ____) {
+  descuento <- ____
+} else if (____ || (____ && ____)) {
+  descuento <- ____
+} else {
+  descuento <- ____
+}
+
+# Salida
+monto_final <- ____
+cat("Descuento aplicado:", descuento * 100, "%\n")
+cat("Monto final a pagar: $", monto_final, "\n")
 ```
 
 ## Python
-```{python}
-#| label: propuesto3-py
-#| eval: false
+```{pyodide-python}
+#| exercise: ex_3
+# Variables de entrada
+tipo_cliente = "____"
+monto_compra = ____
+tiene_cupon = False
 
-# Completa aquí tu solución en Python
+# Evaluación de condicionales
+if (____ and ____) or ____:
+    descuento = ____
+elif ____ or (____ and ____):
+    descuento = ____
+else:
+    descuento = ____
+
+# Salida
+monto_final = ____
+print(f"Descuento aplicado: {descuento * 100}%")
+print(f"Monto final a pagar: ${monto_final}")
 ```
 :::
 :::
@@ -804,9 +835,11 @@ si es par o impar (deberás combinar dos condicionales).
 ## Sentencias repetitivas
 
 ::: {.teoria}
-Los bucles permiten repetir un bloque de código. Los dos más usados son
-**`for`** (cuando se conoce de antemano la secuencia a recorrer) y
-**`while`** (cuando se repite mientras se cumpla una condición).
+Las sentencias repetitivas o bucles (`for` y `while`) permiten ejecutar un bloque de código **múltiples veces de forma automatizada** hasta cumplir una **condición de parada**, optimizando el procesamiento de datos iterativos en ambos lenguajes. En Python, la estructura for (*cuando se conoce de antemano la secuencia a recorrer*) destaca por su sintaxis clara y su capacidad nativa para iterar directamente sobre colecciones (`for elem in lista:`), complementada por la evaluación booleana continua de while (*cuando se repite mientras se cumpla una condición*). Por su parte, en R los bucles for y while comparten una sintaxis basada en paréntesis y llaves (`for (i in seq) {...}`), aunque dentro del paradigma de este lenguaje su uso suele reservarse para iteraciones dependientes del estado, priorizando en su lugar la vectorización explícita para manipular vectores y data frames de manera óptima.
+:::
+
+:::{.callout-morado .column-margin}
+**Nota**: La familia de funciones **apply** en R (y sus contrapartes vectorizadas en Python, principalmente dentro de Pandas) permite **iterar y aplicar transformaciones sobre estructuras de datos completas** (vectores, matrices, listas, data frames) de manera concisa y eficiente, evitando el uso explícito de bucles for.
 :::
 
 ::: {.panel-tabset}
@@ -833,7 +866,7 @@ while (contador <= 5) {
 ```{python}
 #| label: repetitivas-py
 
-# for: recorre un rango o cualquier iterable
+# for: recorre un rango 
 for i in range(1, 6):
     print("Iteración", i)
 
@@ -845,14 +878,17 @@ while contador <= 5:
 ```
 :::
 
+:::{.callout-morado .column-margin}
+💡 **Tip:** Usa `for` cuando sabes exactamente cuántas veces iterar; usa `while` cuando dependes de una condición que cambia sobre la marcha.
+:::
+
+
+
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 4
-
-**Enunciado:** Recorre un vector/lista de calificaciones y cuenta cuántas
-están aprobadas (≥ 7), usando un bucle `for` (sin usar funciones de
-agregación directas).
+**Ejemplo 4:** Recorra un vector/lista de calificaciones y contabilice cuántas
+están aprobadas (mayor o igual a 7), usando un bucle `for`.
 
 ::: {.panel-tabset}
 ## R
@@ -860,7 +896,7 @@ agregación directas).
 ```{r}
 #| label: resuelto5-r
 
-notas <- c(8, 5, 9, 6, 7, 4, 10)
+notas <- c(8, 5, 9, 6, 7, 4, 10, 2, 9)
 aprobados <- 0
 
 for (n in notas) {
@@ -877,7 +913,7 @@ cat("Aprobados:", aprobados, "\n")
 ```{python}
 #| label: resuelto5-py
 
-notas = [8, 5, 9, 6, 7, 4, 10]
+notas = [8, 5, 9, 6, 7, 4, 10, 2, 9]
 aprobados = 0
 
 for n in notas:
@@ -894,38 +930,141 @@ inicializa una variable contadora antes del bucle y se actualiza dentro de
 él según una condición.
 :::
 
-### Ejercicios propuestos
-
-::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 4
-
-Usando un bucle `while`, encuentra el primer múltiplo de 7 mayor a 200.
+::: {.ejercicio-resuelto}
+**Ejemplo 5:** Escriba un código que permita determinar si un número dado es o no primo.
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto4-r
-#| eval: false
 
-# Completa aquí tu solución en R
+```{r}
+#| label: resuelto05-r
+# Número a evaluar
+n <- 13
+# Casos a verificar
+res <- TRUE # Valor inicial
+if (n <= 1) {
+    res <- FALSE
+  } else if (n == 2){
+    res <- TRUE
+  } else if (n %% 2 == 0){
+    res <- FALSE
+  } else {
+    limite <- floor(sqrt(n)) # Se evalúa hasta la raíz cuadrada de n
+    if (limite >= 3) {
+      for (i in seq(3, limite, by = 2)){
+      if (n %% i == 0) {
+        res <- FALSE
+        break
+      }
+    }
+    }
+  }
+# Resultado
+res
 ```
 
 ## Python
-```{python}
-#| label: propuesto4-py
-#| eval: false
 
-# Completa aquí tu solución en Python
+```{python}
+#| label: resuelto05-py
+import math
+# Número a evaluar
+n = 13
+
+# Casos a verificar
+res = True  # Valor inicial
+
+if n <= 1:
+    res = False
+elif n == 2:
+    res = True
+elif n % 2 == 0:
+    res = False
+else:
+    limite = math.floor(math.sqrt(n))  # Se evalúa hasta la raíz cuadrada de n
+    if limite >= 3:
+        for i in range(3, limite + 1, 2):
+            if n % i == 0:
+                res = False
+                break
+# Resultado
+print(res)
 ```
 :::
+
+:::
+
+
+
+### Ejercicios propuestos
+
+::: {.ejercicio-propuesto}
+
+**Ejercicio 4**: La *serie de Leibniz* permite calcular una aproximación del valor de $\pi$ a través de una suma infinita de términos alternados:
+$$\pi = 4\cdot \sum_{k=0}^{\infty} \frac{(-1)^k}{2k+1}$$
+Escriba un código que permita calcular la aproximación de $\pi$ sumando los primeros $N$ términos de la serie.
+
+::: {.panel-tabset}
+## R
+```{webr}
+#| exercise: ex_4
+# Variables de entrada
+N <- 10000
+# Suma de los primeros N términos
+suma <- ____
+for(k in ____){
+
+}
+```
+
+## Python
+```{pyodide-python}
+#| exercise: ex_4
+# Variables de entrada
+N = 10000
+# Suma de los primeros N términos
+suma = ____
+for i in range(____):
+
+```
+:::
+
+
+**Ejercicio 5**: Escriba un código que reciba un número entero positivo $n$ y verifique experimentalmente el Teorema de Nicómaco que establece la siguiente identidad matemática:
+$$\sum_{k=1}^{n} k^3 = \left(\frac{n(n+1)}{2}\right)^2$$
+
+::: {.panel-tabset}
+## R
+```{webr}
+#| exercise: ex_5
+# Variables de entrada
+
+# Sentencia repetitiva
+
+```
+
+## Python
+```{pyodide-python}
+#| exercise: ex_5
+# Variables de entrada
+
+# Sentencia repetitiva
+
+```
+:::
+
 :::
 
 ## Creación de funciones
 
 ::: {.teoria}
-Una función agrupa un bloque de código reutilizable que recibe
-**argumentos** (entradas) y produce un **valor de retorno** (salida). Ambos
-lenguajes admiten valores por defecto para los argumentos.
+La definición de funciones en R y Python comparte el objetivo fundamental de promover la **modularidad**, **la reutilización de código** y la **legibilidad**. En Python, las funciones se crean mediante la palabra clave `def`, seguida del nombre de la función, sus parámetros entre paréntesis y dos puntos (`:`). La estructura y pertenencia del bloque de código se gestionan estrictamente a través de la *indentación*. En R, las funciones son objetos de primera clase que se asignan a una variable utilizando la palabra clave `function()` acompañada del bloque de instrucciones delimitado por llaves (`{}`). Ambos lenguajes permiten especificar valores por defecto para los argumentos y soportan el paso de parámetros tanto por posición como por nombre.
+
+Una diferencia clave reside en el *mecanismo de retorno* de valores y el ámbito de las variables (scoping). Python utiliza la sentencia explícita `return` para devolver un objeto; si esta se omite, la función retorna `None` por defecto. En cambio, R devuelve automáticamente el resultado de la última expresión evaluada dentro del cuerpo de la función, aunque la función `return()` puede emplearse para salidas anticipadas. Además, R maneja un alcance léxico (lexical scoping) orientado a entornos (`environments`), donde los objetos internos no modifican el entorno global a menos que se use el operador de asignación profunda (`<<-`), mientras que Python gestiona los entornos mediante reglas de ámbito local, global y no local (`nonlocal`).
+:::
+
+:::{.callout-morado .column-margin}
+Una función agrupa un bloque de código reutilizable que recibe **argumentos** (entradas) y produce un **valor de retorno** (salida). Ambos lenguajes admiten valores por defecto para los argumentos.
 :::
 
 ::: {.panel-tabset}
@@ -933,7 +1072,7 @@ lenguajes admiten valores por defecto para los argumentos.
 
 ```{r}
 #| label: funciones-r
-
+# Índice de masa corporal
 calcular_imc <- function(peso, altura) {
   imc <- peso / (altura^2)
   return(round(imc, 2))
@@ -954,7 +1093,7 @@ saludar("Luis", saludo = "Buenos días")
 
 ```{python}
 #| label: funciones-py
-
+# Índice de masa corporal
 def calcular_imc(peso, altura):
     imc = peso / (altura ** 2)
     return round(imc, 2)
@@ -973,9 +1112,8 @@ saludar("Luis", saludo="Buenos días")
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 5
 
-**Enunciado:** Crea una función que reciba un vector/lista de números y
+**Ejemplo 6:** Crea una función que reciba un vector/lista de números y
 devuelva un resumen con el mínimo, máximo y promedio.
 
 ::: {.panel-tabset}
