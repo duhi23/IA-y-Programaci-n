@@ -6,7 +6,7 @@ author: "Diego Huaraca"
 date: last-modified
 format: 
   live-html:
-    embed-resources: true
+    #embed-resources: true
     css: styles.css
     toc: true
     toc-title: "Contenidos" 
@@ -1114,73 +1114,151 @@ saludar("Luis", saludo="Buenos días")
 
 ::: {.ejercicio-resuelto}
 
-**Ejemplo 6:** Crea una función que reciba un vector/lista de números y
-devuelva un resumen con el mínimo, máximo y promedio.
+**Ejemplo 6:** Escribir una función que reciba dos enteros $n$ y $k$, con $n\geq k$ y calcule la cantidad de subconjuntos $C_{n}^{k}$ distintos de $k$ elementos que se pueden formar a partir de un conjunto de $n$ elementos, es decir:
+$$C_{n}^{k} = \frac{n\cdot(n-1)\cdot(n-2)\ldots (n-k+1)}{1\cdot 2\cdot 3\ldots k}$$
 
 ::: {.panel-tabset}
 ## R
 
 ```{r}
 #| label: resuelto6-r
+combinacion <- function(n, k) {
+  # Validación de restricción n >= k y valores no negativos
+  if (k < 0 || n < k) {
+    stop("Se debe cumplir que n >= k y k >= 0")
+  }
 
-resumen_numerico <- function(x) {
-  list(
-    minimo = min(x),
-    maximo = max(x),
-    promedio = mean(x)
-  )
+  if (k == 0) return(1)
+  
+  numerador <- prod(n:(n - k + 1))
+  denominador <- prod(1:k)
+  return(as.integer(numerador / denominador))
 }
-
-resumen_numerico(c(4, 8, 15, 16, 23, 42))
+combinacion(5,2)
 ```
 
 ## Python
 
 ```{python}
 #| label: resuelto6-py
+import math
 
-def resumen_numerico(x):
-    return {
-        "minimo": min(x),
-        "maximo": max(x),
-        "promedio": sum(x) / len(x)
-    }
+def combinacion(n: int, k: int) -> int:
+    # Validación de restricción n >= k y valores no negativos
+    if k < 0 or n < k:
+        raise ValueError("Se debe cumplir que n >= k y k >= 0")
+    
+    if k == 0:
+        return 1
+    
+    numerador = math.prod(range(n - k + 1, n + 1))
+    denominador = math.prod(range(1, k + 1))
+    
+    return numerador // denominador
 
-resumen_numerico([4, 8, 15, 16, 23, 42])
+combinacion(5,2)
 ```
 :::
 
-**Interpretación del resultado:** Devolver una lista/diccionario en lugar de
-varios valores sueltos permite empaquetar resultados relacionados y
-acceder a cada uno por nombre, lo cual hace el código más legible.
+
+**Ejemplo 7:** Utilizando la función `combinacion(n, k)` definida previamente, escriba una nueva función que reciba un entero no negativo $n$ y calcule el valor de $2^n$ aprovechando la propiedad de la suma de los coeficientes binomiales:
+$$2^n = \sum_{k=0}^{n} C_{n}^{k}$$
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: resuelto7-r
+potencia_dos <- function(n) {
+  if (n < 0 || n %% 1 != 0) {
+    stop("El valor de n debe ser un entero no negativo.")
+  }
+  
+  # Evalúa la función combinacion para cada k en el rango [0, n]
+  resultado <- sum(sapply(0:n, function(k) combinacion(n, k)))
+  
+  return(resultado)
+}
+potencia_dos(5)
+```
+
+## Python
+
+```{python}
+#| label: resuelto7-py
+def potencia_dos(n: int) -> int:
+    if not isinstance(n, int) or n < 0:
+        raise ValueError("El valor de n debe ser un entero no negativo.")
+    
+    # Suma las combinaciones C(n, k) desde k = 0 hasta k = n
+    return sum(combinacion(n, k) for k in range(n + 1))
+
+print(potencia_dos(5))
+```
+:::
+
+
 :::
 
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 5
 
-Crea una función `es_primo(n)` que reciba un número entero y devuelva
-`TRUE`/`True` si es primo, `FALSE`/`False` en caso contrario. Pruébala con
-al menos 5 números distintos.
+**Ejercicio 6**: Crear una función que reciba un número entero $n > 0$ y devuelva
+`TRUE`/`True` si es primo, `FALSE`/`False` en caso contrario. 
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto5-r
-#| eval: false
-
+```{webr}
+#| exercise: ex_6
 # Completa aquí tu solución en R
+es_primo <- function(n){
+  if (n <= 1) return(____)
+
+  return(____)
+}
 ```
 
 ## Python
-```{python}
-#| label: propuesto5-py
-#| eval: false
-
+```{pyodide-python}
+#| exercise: ex_6
 # Completa aquí tu solución en Python
+import math
+
+def es_primo(n: int) -> bool:
+    if n <= 1:
+        return ____
+
+    return ____
 ```
 :::
+
+
+**Ejercicio 7**: Utilizando la función `es_primo` definida previamente, escriba una nueva función que reciba dos enteros $a$ y $b$ (con $a\leq b$) y devuelva la cantidad total de números primos contenidos en el intervalo cerrado $[a,b]$.
+
+::: {.panel-tabset}
+## R
+```{webr}
+#| exercise: ex_7
+# Completa aquí tu solución en R
+contar_primos <- function(a, b) {
+
+  return(____)
+}
+```
+
+## Python
+```{pyodide-python}
+#| exercise: ex_7
+# Completa aquí tu solución en Python
+import math
+
+def contar_primos(a: int, b: int) -> int:
+
+    return ____
+```
+:::
+
 :::
 
 ## Lectura y escritura de archivos
@@ -1198,6 +1276,8 @@ en R y Python para las fuentes más comunes.
 | Excel        | `readxl::read_excel()` / `openxlsx::write.xlsx()` | `pd.read_excel()` / `.to_excel()` |
 | JSON         | `jsonlite::fromJSON()` / `toJSON()` | `json.load()` / `json.dump()`, o `pd.read_json()` |
 :::
+
+![Archivos Externos](imgs/json.png){.column-margin width=250px}
 
 ::: {.panel-tabset}
 ## R
@@ -1278,7 +1358,7 @@ CSV, y vuelve a leerlo para confirmar que se guardó correctamente.
 ## R
 
 ```{r}
-#| label: resuelto7-r
+#| label: resuelto8-r
 
 estudiantes <- data.frame(
   nombre = c("Ana", "Luis", "Marta"),
@@ -1293,7 +1373,7 @@ verificacion
 ## Python
 
 ```{python}
-#| label: resuelto7-py
+#| label: resuelto8-py
 
 import pandas as pd
 
