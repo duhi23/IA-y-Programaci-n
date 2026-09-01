@@ -6,6 +6,7 @@ author: "Diego Huaraca"
 date: last-modified
 format: 
   live-html:
+    embed-resources: true
     css: styles.css
     toc: true
     toc-title: "Contenidos" 
@@ -34,9 +35,9 @@ format:
 #| include: false
 
 library(reticulate)
-if (!py_module_available("pandas")) {
-  py_install(c("pandas", "numpy", "matplotlib", "openpyxl"))
-}
+#if (!py_module_available("pandas")) {
+#  py_install(c("pandas", "numpy", "matplotlib", "openpyxl"))
+#}
 ```
 
 ::: {.column-margin}
