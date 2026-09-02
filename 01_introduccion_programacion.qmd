@@ -1265,16 +1265,15 @@ def contar_primos(a: int, b: int) -> int:
 
 ::: {.teoria}
 Los datos rara vez se escriben a mano dentro del código: normalmente se
-leen desde archivos externos (texto, CSV, Excel, JSON) y, tras procesarlos,
-se guardan de vuelta. A continuación se muestran las funciones equivalentes
+leen desde archivos externos (texto, CSV, Excel) y, tras procesarlos,
+se guardan de vuelta. A continuación, se muestran las funciones equivalentes
 en R y Python para las fuentes más comunes.
 
-| Formato      | R                                   | Python (pandas / json / base)   |
+| Formato      | R (readr / readxl / base)            | Python (pandas / base)           |
 |--------------|--------------------------------------|----------------------------------|
-| Texto plano  | `readLines()` / `writeLines()`      | `open()` + `.read()`/`.write()` |
-| CSV          | `read.csv()` / `write.csv()`        | `pd.read_csv()` / `.to_csv()`   |
+| Texto plano  | `read.table()` / `write.table()`      | `open()` + `.read()`/`.write()` |
+| CSV          | `readr::read_csv()` / `readr::write_csv()`        | `pd.read_csv()` / `.to_csv()`   |
 | Excel        | `readxl::read_excel()` / `openxlsx::write.xlsx()` | `pd.read_excel()` / `.to_excel()` |
-| JSON         | `jsonlite::fromJSON()` / `toJSON()` | `json.load()` / `json.dump()`, o `pd.read_json()` |
 :::
 
 ![Archivos Externos](imgs/json.png){.column-margin width=250px}
@@ -1287,23 +1286,19 @@ en R y Python para las fuentes más comunes.
 #| eval: false
 
 # --- Texto plano ---
-lineas <- readLines("datos/notas.txt")
-writeLines(c("línea 1", "línea 2"), "datos/salida.txt")
+datos <- read.table("data/Seguros_Vehiculos.txt", sep = "\t", header = TRUE)
+write.table(datos, "data/Seguros_Extra.txt", row.names = FALSE, sep = "\t", quote = FALSE)
 
 # --- CSV ---
-datos <- read.csv("datos/estudiantes.csv")
-write.csv(datos, "datos/estudiantes_editado.csv", row.names = FALSE)
+library(readr)
+datos <- read_csv2("data/Seguros_Vehiculos.csv")
+readr::write_csv(datos, "data/Seguros_Extra.csv")
 
-# --- Excel (requiere el paquete readxl / openxlsx) ---
+# --- Excel ---
 library(readxl)
 library(openxlsx)
-datos_excel <- read_excel("datos/notas.xlsx", sheet = 1)
-write.xlsx(datos_excel, "datos/notas_editado.xlsx")
-
-# --- JSON (requiere el paquete jsonlite) ---
-library(jsonlite)
-datos_json <- fromJSON("datos/config.json")
-write_json(datos_json, "datos/config_editado.json", pretty = TRUE)
+datos <- readxl::read_excel("data/Seguros_Vehiculos.xlsx", sheet = 1)
+write.xlsx(datos, "data/Seguros_Extra.xlsx")
 ```
 
 ## Python
@@ -1313,46 +1308,35 @@ write_json(datos_json, "datos/config_editado.json", pretty = TRUE)
 #| eval: false
 
 import pandas as pd
-import json
 
-# --- Texto plano ---
-with open("datos/notas.txt", "r") as f:
-    lineas = f.readlines()
+# --- Archivo TXT ---
+datos = pd.read_csv("data/Seguros_Vehiculos.txt", sep="\t")
+datos.to_csv("data/Seguros_Extra.txt", sep="\t", index=False, quoting=3)
 
-with open("datos/salida.txt", "w") as f:
-    f.write("línea 1\nlínea 2\n")
+# --- Archivo CSV ---
+datos = pd.read_csv("data/Seguros_Vehiculos.csv", sep=";")
+datos.to_csv("data/Seguros_Extra.csv", index=False)
 
-# --- CSV ---
-datos = pd.read_csv("datos/estudiantes.csv")
-datos.to_csv("datos/estudiantes_editado.csv", index=False)
-
-# --- Excel (requiere la librería openpyxl instalada) ---
-datos_excel = pd.read_excel("datos/notas.xlsx", sheet_name=0)
-datos_excel.to_excel("datos/notas_editado.xlsx", index=False)
-
-# --- JSON ---
-with open("datos/config.json", "r") as f:
-    datos_json = json.load(f)
-
-with open("datos/config_editado.json", "w") as f:
-    json.dump(datos_json, f, indent=2, ensure_ascii=False)
+# --- Archivo Excel ---
+datos = pd.read_excel("data/Seguros_Vehiculos.xlsx", sheet_name=0)
+datos.to_excel("data/Seguros_Extra.xlsx", index=False)
 ```
 :::
 
-::: {.callout-objetivo}
-Buena práctica: usa siempre **rutas relativas** dentro del proyecto (por
-ejemplo `"datos/archivo.csv"`) en lugar de rutas absolutas de tu
-computador, para que el `.qmd` funcione igual en cualquier máquina y al
+:::{.callout-morado .column-margin}
+💡 **Tip:** Usa siempre **rutas relativas** dentro del proyecto (por
+ejemplo `"data/archivo.csv"`) en lugar de rutas absolutas de tu
+computador, para que los archivos funcionen igual en cualquier máquina y al
 subirlo a GitHub.
 :::
+
 
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 6
 
-**Enunciado:** Crea un dataframe con datos de 3 estudiantes, guárdalo como
-CSV, y vuelve a leerlo para confirmar que se guardó correctamente.
+**Ejemplo 8:** Crear un dataframe con datos de 5 estudiantes, guárdalo como
+CSV, y vuelva a leerlo para confirmar que se guardó correctamente.
 
 ::: {.panel-tabset}
 ## R
@@ -1361,8 +1345,11 @@ CSV, y vuelve a leerlo para confirmar que se guardó correctamente.
 #| label: resuelto8-r
 
 estudiantes <- data.frame(
-  nombre = c("Ana", "Luis", "Marta"),
-  promedio = c(8.5, 7.2, 9.1)
+  nombre = c("Ana", "Luis", "Marta", "Diego", "Sofía"),
+  promedio = c(8.5, 7.2, 9.1, 6.8, 9.5),
+  matricula = c(1, 2, 1, 1, 2),
+  edad = c(20, 21, 19, 22, 20),
+  sexo = c("F", "M", "F", "M", "F")
 )
 
 write.csv(estudiantes, "estudiantes_temp.csv", row.names = FALSE)
@@ -1378,8 +1365,11 @@ verificacion
 import pandas as pd
 
 estudiantes = pd.DataFrame({
-    "nombre": ["Ana", "Luis", "Marta"],
-    "promedio": [8.5, 7.2, 9.1]
+    "nombre": ["Ana", "Luis", "Marta", "Diego", "Sofía"],
+    "promedio": [8.5, 7.2, 9.1, 6.8, 9.5],
+    "matricula": [1, 2, 1, 1, 2],
+    "edad": [20, 21, 19, 22, 20],
+    "sexo": ["F", "M", "F", "M", "F"]
 })
 
 estudiantes.to_csv("estudiantes_temp.csv", index=False)
@@ -1396,55 +1386,26 @@ que normalmente no aporta información útil al archivo exportado.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 6
 
-Crea un archivo de texto plano con 5 líneas (una frase por línea), léelo de
-vuelta, y cuenta cuántas líneas contienen la palabra "datos".
+**Ejercicio 8**: Crear un archivo de texto plano y excel con información de 7 países (país, capital, idioma, población, moneda), léalo de vuelta y guárdalo en un dataframe llamado "data".
 
 ::: {.panel-tabset}
 ## R
-```{r}
-#| label: propuesto6-r
-#| eval: false
-
-# Completa aquí tu solución en R
-```
-
-## Python
-```{python}
-#| label: propuesto6-py
-#| eval: false
-
-# Completa aquí tu solución en Python
-```
-:::
-:::
-
-::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 7
-
-Descarga o crea un archivo `.csv` con al menos 10 filas de datos de tu
-elección, léelo, agrega una columna calculada, y guarda el resultado en un
-nuevo archivo `.xlsx`.
-
-::: {.panel-tabset}
-## R
-```{r}
+```{webr}
 #| label: propuesto8-r
-#| eval: false
 
 # Completa aquí tu solución en R
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto8-py
-#| eval: false
 
 # Completa aquí tu solución en Python
 ```
 :::
 :::
+
 
 ## Resumen del tema
 
