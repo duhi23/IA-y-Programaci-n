@@ -1,8 +1,33 @@
 ---
 title: "Tema 2: Limpieza y visualización de datos con R y Python"
-subtitle: "[Nombre del módulo / curso]"
-author: "[Tu nombre]"
+subtitle: "IA y Programación"
+lang: es
+author: "Diego Huaraca"
 date: last-modified
+format: 
+  live-html:
+    #embed-resources: true
+    css: styles.css
+    toc: true
+    toc-title: "Contenidos" 
+    toc-depth: 3
+    toc-location: left
+    include-in-header:
+      text: |
+        <style>
+          .logos-auspiciantes {
+            position: absolute;
+            top: 25px;
+            right: 220;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+          }
+          .logos-auspiciantes img {
+            max-height: 50px;
+            width: auto;
+          }
+        </style>
 ---
 
 ```{r}
@@ -23,20 +48,21 @@ faltantes_py <- paquetes_py[!sapply(paquetes_py, py_module_available)]
 if (length(faltantes_py) > 0) py_install(faltantes_py)
 ```
 
+::: {.column-margin}
+::: {.logos-auspiciantes}
+![](imgs/epn.png)
+![](imgs/puce.png)
+:::
+:::
+
 ## Motivación {.unnumbered}
 
 ::: {.motivacion}
 **¿Por qué nos importa esto?**
 
-En la práctica real, más del 70% del tiempo de un proyecto de datos se va
-en **limpiar y preparar** la información: nombres de texto mal escritos,
-fechas en formatos distintos, números guardados como texto, valores
-faltantes. Solo después de ese trabajo "invisible" tiene sentido construir
-gráficos, y un buen gráfico puede comunicar en segundos lo que una tabla de
-números tarda minutos en transmitir —o puede engañar, si está mal
-construido. Este tema te da las herramientas para limpiar variables de
-texto, fecha y numéricas, y para construir visualizaciones de calidad
-profesional (estáticas y dinámicas) en R y en Python.
+En la práctica real, más del 70% del tiempo de un proyecto de datos se consume en **limpiar y preparar** la información: nombres mal escritos, fechas en formatos distintos, números guardados como texto, valores faltantes. Solo después de ese trabajo **invisible**** tiene sentido construir
+gráficos y modelos, por otro lado, un buen gráfico puede comunicar en segundos lo que una tabla de
+números tarda minutos en transmitir, o a su vez, puede engañar, si está mal construido. Este tema proporciona al estudiante herramientas para limpiar variables de texto, fecha y numéricas, y para construir visualizaciones de calidad profesional (estáticas y dinámicas) en R y en Python.
 :::
 
 ## Objetivos de aprendizaje
@@ -51,8 +77,8 @@ Al finalizar este tema, el estudiante será capaz de:
 
 ## Conjunto de datos de ejemplo
 
-Usaremos un mismo conjunto de datos simulado —ventas mensuales de una
-tienda— a lo largo de todo el tema, para que cada técnica se vea aplicada
+Usaremos un mismo conjunto de datos simulado sobre ventas mensuales de una
+tienda a lo largo de todo el tema, para que cada técnica se vea aplicada
 sobre el mismo contexto.
 
 ::: {.panel-tabset}
@@ -63,7 +89,7 @@ sobre el mismo contexto.
 
 set.seed(123)
 
-fechas <- seq(as.Date("2024-01-01"), as.Date("2024-12-01"), by = "month")
+fechas <- seq(as.Date("2025-01-01"), as.Date("2025-12-01"), by = "month")
 productos <- c("  laptop ", "MOUSE", "teclado", "Monitor ")
 
 ventas <- data.frame(
@@ -75,6 +101,7 @@ ventas <- data.frame(
 )
 
 head(ventas)
+dim(ventas)
 ```
 
 ## Python
@@ -87,7 +114,7 @@ import pandas as pd
 
 np.random.seed(123)
 
-fechas = pd.date_range("2024-01-01", "2024-12-01", freq="MS")
+fechas = pd.date_range("2025-01-01", "2025-12-01", freq="MS")
 productos = ["  laptop ", "MOUSE", "teclado", "Monitor "]
 
 ventas = pd.DataFrame({
@@ -99,13 +126,16 @@ ventas = pd.DataFrame({
 })
 
 ventas.head()
+ventas.shape
 ```
 :::
 
-Nota que a propósito los nombres de producto tienen espacios y mayúsculas
+:::{.callout-morado .column-margin}
+A propósito los nombres de los productos tienen espacios y mayúsculas
 inconsistentes: así se ven los datos "crudos" en la vida real.
+:::
 
-## 1. Tratamiento de variables de texto
+## Tratamiento de variables de texto
 
 ::: {.teoria}
 Las operaciones de texto más comunes son: quitar espacios sobrantes,
@@ -124,12 +154,12 @@ columna a columna.
 
 x <- "  Laptop Gamer  "
 
-str_trim(x)                          # quita espacios al inicio/fin
-str_to_lower(x)                      # minúsculas
-str_to_title(str_trim(x))            # formato título
-str_detect(x, "Gamer")               # ¿contiene el patrón?
-str_replace(x, "Gamer", "Pro")       # reemplaza el patrón
-str_split("R,Python,SQL", ",")       # divide una cadena
+str_trim(x)                     # quita espacios al inicio/fin
+str_to_lower(x)                 # minúsculas
+str_to_title(str_trim(x))       # formato título
+str_detect(x, "Gamer")          # ¿contiene el patrón?
+str_replace(x, "Gamer", "Pro")  # reemplaza el patrón
+str_split("R,Python,SQL", ",")  # divide una cadena
 
 # Aplicado a toda una columna del dataframe
 ventas$producto <- str_to_title(str_trim(ventas$producto))
@@ -143,12 +173,12 @@ unique(ventas$producto)
 
 x = "  Laptop Gamer  "
 
-x.strip()                            # quita espacios al inicio/fin
-x.lower()                            # minúsculas
-x.strip().title()                    # formato título
-"Gamer" in x                         # ¿contiene el patrón?
-x.replace("Gamer", "Pro")            # reemplaza el patrón
-"R,Python,SQL".split(",")            # divide una cadena
+x.strip()                  # quita espacios al inicio/fin
+x.lower()                  # minúsculas
+x.strip().title()          # formato título
+"Gamer" in x               # ¿contiene el patrón?
+x.replace("Gamer", "Pro")  # reemplaza el patrón
+"R,Python,SQL".split(",")  # divide una cadena
 
 # Aplicado a toda una columna del DataFrame (accesor .str)
 ventas["producto"] = ventas["producto"].str.strip().str.title()
@@ -156,7 +186,10 @@ ventas["producto"].unique()
 ```
 :::
 
-## 2. Tratamiento de variables de fecha
+[Guía rápida de stringr](./docs/stringr-cheat-sheet.pdf)
+
+
+## Tratamiento de variables de fecha
 
 ::: {.teoria}
 Las fechas deben tratarse como un tipo de dato propio (no como texto) para
@@ -171,7 +204,7 @@ Python, el tipo `datetime` nativo y el accesor `.dt` de pandas.
 ```{r}
 #| label: fechas-r
 
-f <- ymd("2024-03-15")   # convierte texto a fecha (año-mes-día)
+f <- ymd("2025-03-15")   # convierte texto a fecha (año-mes-día)
 
 year(f); month(f); day(f); wday(f, label = TRUE)
 f + months(2)                       # aritmética de fechas
@@ -188,7 +221,7 @@ head(ventas[, c("fecha", "anio", "mes")])
 ```{python}
 #| label: fechas-py
 
-f = pd.to_datetime("2024-03-15")
+f = pd.to_datetime("2025-03-15")
 
 f.year, f.month, f.day, f.day_name()
 f + pd.DateOffset(months=2)                         # aritmética de fechas
@@ -201,7 +234,9 @@ ventas[["fecha", "anio", "mes"]].head()
 ```
 :::
 
-## 3. Tratamiento de variables numéricas
+[Guía rápida de lubridate](./docs/lubridate-cheat-sheet.pdf)
+
+## Tratamiento de variables numéricas
 
 ::: {.teoria}
 Con variables numéricas es común: redondear, formatear para lectura humana
@@ -331,7 +366,7 @@ porcentaje del ingreso total corresponde a la región "Norte".
 :::
 :::
 
-## 4. Gráficos estáticos de alta calidad
+## Gráficos estáticos de alta calidad
 
 ::: {.teoria}
 Un gráfico de "calidad profesional" no es solo el tipo de gráfico correcto:
@@ -346,7 +381,7 @@ elimina el ruido visual innecesario. En R usaremos `ggplot2`; en Python,
   (scatter) o histograma.
 :::
 
-### 4.1 Gráfico de tendencia
+### Gráfico de tendencia
 
 ::: {.panel-tabset}
 ## R
@@ -393,7 +428,7 @@ plt.show()
 ```
 :::
 
-### 4.2 Gráfico de comparación
+### Gráfico de comparación
 
 ::: {.panel-tabset}
 ## R
@@ -443,7 +478,7 @@ plt.show()
 ```
 :::
 
-### 4.3 Gráfico de estructura
+### Gráfico de estructura
 
 ::: {.panel-tabset}
 ## R
@@ -565,7 +600,7 @@ Cuida título, etiquetas de ejes y paleta de color en los tres.
 :::
 :::
 
-## 5. Gráficos dinámicos
+## Gráficos dinámicos
 
 ::: {.teoria}
 Un gráfico dinámico (interactivo) permite explorar los datos directamente
