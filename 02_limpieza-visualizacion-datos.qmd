@@ -37,15 +37,15 @@ format:
 library(reticulate)
 
 # --- Autoinstalación de paquetes de R usados en este documento ---
-paquetes_r <- c("stringr", "lubridate", "dplyr", "tidyr", "ggplot2", "scales", "plotly")
-faltantes_r <- paquetes_r[!sapply(paquetes_r, requireNamespace, quietly = TRUE)]
-if (length(faltantes_r) > 0) install.packages(faltantes_r)
-invisible(lapply(paquetes_r, library, character.only = TRUE))
+#paquetes_r <- c("stringr", "lubridate", "dplyr", "tidyr", "ggplot2", "scales", "plotly")
+#faltantes_r <- paquetes_r[!sapply(paquetes_r, requireNamespace, quietly = TRUE)]
+#if (length(faltantes_r) > 0) install.packages(faltantes_r)
+#invisible(lapply(paquetes_r, library, character.only = TRUE))
 
 # --- Autoinstalación de módulos de Python usados en este documento ---
-paquetes_py <- c("pandas", "numpy", "matplotlib", "seaborn", "plotly")
-faltantes_py <- paquetes_py[!sapply(paquetes_py, py_module_available)]
-if (length(faltantes_py) > 0) py_install(faltantes_py)
+#paquetes_py <- c("pandas", "numpy", "matplotlib", "seaborn", "plotly")
+#faltantes_py <- paquetes_py[!sapply(paquetes_py, py_module_available)]
+#if (length(faltantes_py) > 0) py_install(faltantes_py)
 ```
 
 ::: {.column-margin}
@@ -60,8 +60,7 @@ if (length(faltantes_py) > 0) py_install(faltantes_py)
 ::: {.motivacion}
 **¿Por qué nos importa esto?**
 
-En la práctica real, más del 70% del tiempo de un proyecto de datos se consume en **limpiar y preparar** la información: nombres mal escritos, fechas en formatos distintos, números guardados como texto, valores faltantes. Solo después de ese trabajo **invisible**** tiene sentido construir
-gráficos y modelos, por otro lado, un buen gráfico puede comunicar en segundos lo que una tabla de
+En la práctica, más del 70% del tiempo de un proyecto de datos se consume en **limpiar y preparar** la información. Por ejemplo: nombres mal escritos, fechas en formatos distintos, números guardados como texto, valores faltantes. Solo después de ese trabajo **invisible**** tiene sentido construir gráficos y modelos, por otro lado, un buen gráfico puede comunicar en segundos lo que una tabla de
 números tarda minutos en transmitir, o a su vez, puede engañar, si está mal construido. Este tema proporciona al estudiante herramientas para limpiar variables de texto, fecha y numéricas, y para construir visualizaciones de calidad profesional (estáticas y dinámicas) en R y en Python.
 :::
 
@@ -75,7 +74,7 @@ Al finalizar este tema, el estudiante será capaz de:
 - Construir gráficos dinámicos (interactivos) con `plotly` en ambos
   lenguajes.
 
-## Conjunto de datos de ejemplo
+## Conjunto de datos
 
 Usaremos un mismo conjunto de datos simulado sobre ventas mensuales de una
 tienda a lo largo de todo el tema, para que cada técnica se vea aplicada
@@ -241,7 +240,7 @@ ventas[["fecha", "anio", "mes"]].head()
 ::: {.teoria}
 Con variables numéricas es común: redondear, formatear para lectura humana
 (separadores de miles, símbolos de moneda/porcentaje), detectar valores
-faltantes (`NA`/`NaN`) y valores atípicos.
+faltantes (`NA`/`NaN`), crear flags y valores atípicos.
 :::
 
 ::: {.panel-tabset}
@@ -258,7 +257,7 @@ scales::dollar(n)
 scales::percent(0.256, accuracy = 0.1)
 
 # Valores faltantes
-v <- c(10, NA, 15, NA, 20)
+v <- c(10, NA, 18, NA, 20)
 sum(is.na(v))                # cuántos faltantes hay
 v[is.na(v)] <- mean(v, na.rm = TRUE)  # imputar con la media
 v
@@ -277,7 +276,7 @@ f"${n:,.2f}"
 f"{0.256:.1%}"
 
 # Valores faltantes
-v = pd.Series([10, np.nan, 15, np.nan, 20])
+v = pd.Series([10, np.nan, 18, np.nan, 20])
 v.isna().sum()                       # cuántos faltantes hay
 v = v.fillna(v.mean())               # imputar con la media
 v
@@ -287,17 +286,16 @@ v
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 1
 
-**Enunciado:** A partir del dataframe `ventas`, crea una columna
-`ingreso = unidades * precio_unitario`, formatea el ingreso total del año
+**Ejemplo 1:** A partir del dataframe `ventas`, crear una columna
+`ingreso = unidades * precio_unitario`, formatear el ingreso total del año
 como moneda (con separador de miles), y muestra en qué mes se registró el
 ingreso más alto.
 
-**Solución razonada:** Primero calculamos la columna derivada `ingreso`
-(operación numérica vectorizada), luego agregamos por mes usando `mes` (ya
-extraído previamente de la fecha), y finalmente formateamos el resultado
-para lectura humana.
+**Solución:** Primero se calcula la columna derivada `ingreso`
+(operación numérica vectorizada), luego se agrega por mes usando `mes` (ya
+extraído previamente de la fecha), y finalmente, se formatea el resultado
+para lectura.
 
 ::: {.panel-tabset}
 ## R
@@ -340,26 +338,24 @@ directa de una sola línea, tanto con `aggregate()` en R como con
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 1
 
-Sobre el dataframe `ventas`: (a) crea una columna de texto `producto_region`
-que combine el producto y la región en formato `"Producto (Región)"`; (b)
-crea una columna `trimestre` a partir de la fecha; (c) calcula qué
-porcentaje del ingreso total corresponde a la región "Norte".
+**Ejercicio 1**: Sobre el dataframe `ventas`, se pide: 
+
+  a. Crear una columna de texto `producto_region` que combine el producto y la región en formato `"Producto (Región)"`; 
+  b. Crear una columna `trimestre` a partir de la fecha; 
+  c. Calcular qué porcentaje del ingreso total corresponde a la región "Norte".
 
 ::: {.panel-tabset}
 ## R
-```{r}
+```{webr}
 #| label: propuesto1-r
-#| eval: false
 
 # Completa aquí tu solución en R
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto1-py
-#| eval: false
 
 # Completa aquí tu solución en Python
 ```
@@ -634,16 +630,16 @@ plotly::ggplotly(grafico_estatico, tooltip = c("x", "y", "text", "colour"))
 ```{python}
 #| label: dinamico-py
 
-import plotly.express as px
+#import plotly.express as px
 
-fig_dinamico = px.scatter(
-    ventas, x="precio_unitario", y="unidades",
-    color="producto", hover_data=["region"],
-    title="Precio vs. unidades vendidas (interactivo)",
-    labels={"precio_unitario": "Precio unitario", "unidades": "Unidades vendidas"}
-)
-fig_dinamico.update_layout(template="plotly_white")
-fig_dinamico.show()
+#fig_dinamico = px.scatter(
+#    ventas, x="precio_unitario", y="unidades",
+#    color="producto", hover_data=["region"],
+#    title="Precio vs. unidades vendidas (interactivo)",
+#    labels={"precio_unitario": "Precio unitario", "unidades": "Unidades vendidas"}
+#)
+#fig_dinamico.update_layout(template="plotly_white")
+#fig_dinamico.show()
 ```
 :::
 
@@ -683,13 +679,13 @@ plotly::ggplotly(grafico_tendencia)
 ```{python}
 #| label: resuelto3-py
 
-fig_tendencia = px.line(
-    ingreso_mensual, x="fecha", y="ingreso", markers=True,
-    title="Evolución del ingreso mensual",
-    labels={"fecha": "Mes", "ingreso": "Ingreso"}
-)
-fig_tendencia.update_layout(template="plotly_white")
-fig_tendencia.show()
+#fig_tendencia = px.line(
+#    ingreso_mensual, x="fecha", y="ingreso", markers=True,
+#    title="Evolución del ingreso mensual",
+#    labels={"fecha": "Mes", "ingreso": "Ingreso"}
+#)
+#fig_tendencia.update_layout(template="plotly_white")
+#fig_tendencia.show()
 ```
 :::
 
