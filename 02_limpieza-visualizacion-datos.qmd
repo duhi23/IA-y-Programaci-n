@@ -6,7 +6,7 @@ author: "Diego Huaraca"
 date: last-modified
 format: 
   live-html:
-    #embed-resources: true
+    embed-resources: true
     css: styles.css
     toc: true
     toc-title: "Contenidos" 
@@ -341,7 +341,7 @@ directa de una sola línea, tanto con `aggregate()` en R como con
 
 **Ejercicio 1**: Sobre el dataframe `ventas`, se pide: 
 
-  a. Crear una columna de texto `producto_region` que combine el producto y la región en formato `"Producto (Región)"`; 
+  a. Crear una columna de texto `producto_region` que combine el producto y la región en formato `"Producto (Región)"` y calcule el ingreso total por cada combinación; 
   b. Crear una columna `trimestre` a partir de la fecha; 
   c. Calcular qué porcentaje del ingreso total corresponde a la región "Norte".
 
@@ -365,10 +365,10 @@ directa de una sola línea, tanto con `aggregate()` en R como con
 ## Gráficos estáticos de alta calidad
 
 ::: {.teoria}
-Un gráfico de "calidad profesional" no es solo el tipo de gráfico correcto:
-incluye título, etiquetas de ejes claras, una paleta de color intencional y
-elimina el ruido visual innecesario. En R usaremos `ggplot2`; en Python,
-`matplotlib`/`seaborn`. Distinguimos tres propósitos:
+Un gráfico de **calidad profesional** no es solo el tipo de gráfico correcto:
+incluye título, etiquetas de ejes, una paleta de color intencional y
+elimina el ruido visual innecesario. En R se sugiere usar `ggplot2`; y en Python,
+`matplotlib`/`seaborn`. Se enlistan los tres propósitos principales de un gráfico y el tipo recomendado para cada uno:
 
 - **Tendencia**: cómo cambia una variable en el tiempo → gráfico de línea.
 - **Comparación**: cómo se comparan categorías entre sí → gráfico de barras
@@ -377,6 +377,10 @@ elimina el ruido visual innecesario. En R usaremos `ggplot2`; en Python,
   (scatter) o histograma.
 :::
 
+[Guía rápida de ggplot2](./docs/data-visualization-sheet.pdf)
+
+[Guía rápida de seaborn](./docs/seaborn-sheet.pdf)
+
 ### Gráfico de tendencia
 
 ::: {.panel-tabset}
@@ -384,6 +388,7 @@ elimina el ruido visual innecesario. En R usaremos `ggplot2`; en Python,
 
 ```{r}
 #| label: tendencia-r
+head(ventas)
 
 ingreso_mensual <- aggregate(ingreso ~ fecha, data = ventas, sum)
 
@@ -408,6 +413,7 @@ ggplot(ingreso_mensual, aes(x = fecha, y = ingreso)) +
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
+ventas.head()
 ingreso_mensual = ventas.groupby("fecha")["ingreso"].sum().reset_index()
 
 fig, ax = plt.subplots(figsize=(7, 4.5))
@@ -431,7 +437,7 @@ plt.show()
 
 ```{r}
 #| label: comparacion-r
-
+head(ventas)
 ingreso_producto <- aggregate(ingreso ~ producto, data = ventas, sum)
 
 ggplot(ingreso_producto, aes(x = reorder(producto, ingreso), y = ingreso, fill = producto)) +
@@ -453,7 +459,7 @@ ggplot(ingreso_producto, aes(x = reorder(producto, ingreso), y = ingreso, fill =
 #| label: comparacion-py
 
 import seaborn as sns
-
+ventas.head()
 ingreso_producto = (
     ventas.groupby("producto")["ingreso"]
     .sum()
@@ -515,9 +521,8 @@ plt.show()
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 2
 
-**Enunciado:** Construye un histograma de alta calidad que muestre la
+**Ejemplo 2:** Construye un histograma de alta calidad que muestre la
 distribución del `ingreso` por transacción, con título, etiquetas de ejes y
 una línea vertical marcando el ingreso promedio.
 
@@ -526,7 +531,7 @@ una línea vertical marcando el ingreso promedio.
 
 ```{r}
 #| label: resuelto2-r
-
+head(ventas)
 promedio_ingreso <- mean(ventas$ingreso)
 
 ggplot(ventas, aes(x = ingreso)) +
@@ -545,7 +550,7 @@ ggplot(ventas, aes(x = ingreso)) +
 
 ```{python}
 #| label: resuelto2-py
-
+ventas.head()
 promedio_ingreso = ventas["ingreso"].mean()
 
 fig, ax = plt.subplots(figsize=(7, 4.5))
@@ -570,26 +575,26 @@ sin tener que leer la cifra exacta.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 2
 
-Construye: (a) un gráfico de línea de la tendencia de unidades vendidas por
-mes (no de ingreso); (b) un boxplot que compare el ingreso por región; (c)
-un gráfico de dispersión de unidades vs. ingreso, coloreado por región.
-Cuida título, etiquetas de ejes y paleta de color en los tres.
+**Ejercicio 2**: A partir del dataframe `ventas`, se pide construir: 
+
+  (a) un gráfico de línea de la tendencia de unidades vendidas por mes (no de ingreso); 
+  (b) un boxplot que compare el ingreso por región; 
+  (c) un gráfico de dispersión de unidades vs. ingreso, coloreado por región.
+
+Cuide el título, etiquetas de ejes y paleta de color en los tres gráficos.
 
 ::: {.panel-tabset}
 ## R
-```{r}
+```{webr}
 #| label: propuesto2-r
-#| eval: false
 
 # Completa aquí tu solución en R
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto2-py
-#| eval: false
 
 # Completa aquí tu solución en Python
 ```
@@ -599,13 +604,17 @@ Cuida título, etiquetas de ejes y paleta de color en los tres.
 ## Gráficos dinámicos
 
 ::: {.teoria}
-Un gráfico dinámico (interactivo) permite explorar los datos directamente
-en el navegador: hacer zoom, pasar el mouse para ver valores exactos
+Un gráfico dinámico (*interactivo*) permite explorar los datos **directamente
+en el navegador**: hacer zoom, pasar el mouse para ver valores exactos
 (*tooltip*), o activar/desactivar categorías desde la leyenda. Es
 especialmente útil en material que se publica como página web (como este
-documento en Moodle), donde el estudiante puede interactuar con el
-gráfico en lugar de ver solo una imagen estática. Usaremos `plotly` en
+documento en Moodle), donde el estudiante puede **interactuar con el
+gráfico** en lugar de ver solo una imagen estática. Se usa el paquete/librería `plotly` en
 ambos lenguajes.
+:::
+
+:::{.callout-morado .column-margin}
+Los gráficos interactivos no se pueden exportar a PDF, solo se pueden ver en HTML (navegador web).
 :::
 
 ::: {.panel-tabset}
@@ -613,7 +622,7 @@ ambos lenguajes.
 
 ```{r}
 #| label: dinamico-r
-
+head(ventas)
 grafico_estatico <- ggplot(ventas, aes(x = precio_unitario, y = unidades,
                                         color = producto,
                                         text = paste("Región:", region))) +
@@ -629,34 +638,34 @@ plotly::ggplotly(grafico_estatico, tooltip = c("x", "y", "text", "colour"))
 
 ```{python}
 #| label: dinamico-py
+ventas.head()
+import plotly.express as px
 
-#import plotly.express as px
-
-#fig_dinamico = px.scatter(
-#    ventas, x="precio_unitario", y="unidades",
-#    color="producto", hover_data=["region"],
-#    title="Precio vs. unidades vendidas (interactivo)",
-#    labels={"precio_unitario": "Precio unitario", "unidades": "Unidades vendidas"}
-#)
-#fig_dinamico.update_layout(template="plotly_white")
-#fig_dinamico.show()
+fig_dinamico = px.scatter(
+    ventas, x="precio_unitario", y="unidades",
+    color="producto", hover_data=["region"],
+    title="Precio vs. unidades vendidas (interactivo)",
+    labels={"precio_unitario": "Precio unitario", "unidades": "Unidades vendidas"}
+)
+fig_dinamico.update_layout(template="plotly_white")
+fig_dinamico.show()
 ```
 :::
 
-::: {.callout-objetivo}
-Nota: en R, `plotly::ggplotly()` convierte automáticamente un gráfico de
+:::{.callout-morado .column-margin}
+💡 **Tip:** En R, `plotly::ggplotly()` convierte automáticamente un gráfico de
 `ggplot2` ya construido en uno interactivo — no hay que rehacerlo desde
 cero. En Python, `plotly.express` construye el gráfico interactivo
 directamente, con una sintaxis muy similar a `seaborn`.
 :::
 
+
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 3
 
-**Enunciado:** Convierte el gráfico de tendencia del ingreso mensual
-(sección 4.1) en una versión interactiva, mostrando en el *tooltip* el mes
+**Ejercicio 3:** Convierta el gráfico de tendencia del ingreso mensual
+en una versión interactiva, mostrando en el *tooltip* el mes
 y el ingreso exacto.
 
 ::: {.panel-tabset}
@@ -679,13 +688,13 @@ plotly::ggplotly(grafico_tendencia)
 ```{python}
 #| label: resuelto3-py
 
-#fig_tendencia = px.line(
-#    ingreso_mensual, x="fecha", y="ingreso", markers=True,
-#    title="Evolución del ingreso mensual",
-#    labels={"fecha": "Mes", "ingreso": "Ingreso"}
-#)
-#fig_tendencia.update_layout(template="plotly_white")
-#fig_tendencia.show()
+fig_tendencia = px.line(
+    ingreso_mensual, x="fecha", y="ingreso", markers=True,
+    title="Evolución del ingreso mensual",
+    labels={"fecha": "Mes", "ingreso": "Ingreso"}
+)
+fig_tendencia.update_layout(template="plotly_white")
+fig_tendencia.show()
 ```
 :::
 
@@ -697,16 +706,15 @@ estática solo se podía estimar visualmente.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 3
 
-Construye un gráfico de barras interactivo del ingreso total por región,
+**Ejercicio 3:** Construya un gráfico de barras interactivo del ingreso total por región,
 donde el *tooltip* muestre además el número de transacciones de esa
-región. (Pista: primero calcula ambas agregaciones —suma de ingreso y
-conteo— antes de graficar.)
+región. (**Pista**: primero calcule ambas agregaciones suma de ingreso y
+conteo antes de graficar.)
 
 ::: {.panel-tabset}
 ## R
-```{r}
+```{webr}
 #| label: propuesto3-r
 #| eval: false
 
@@ -714,9 +722,8 @@ conteo— antes de graficar.)
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto3-py
-#| eval: false
 
 # Completa aquí tu solución en Python
 ```
@@ -737,7 +744,7 @@ conteo— antes de graficar.)
   (tendencia → línea, comparación → barras/boxplot, estructura →
   dispersión/histograma).
 - `plotly` permite convertir o construir gráficos interactivos en ambos
-  lenguajes, útiles para material publicado en la web (como Moodle).
+  lenguajes, útil para material publicado en la web.
 
 ## Referencias
 
