@@ -267,7 +267,7 @@ tipos básicos son equivalentes conceptualmente en ambos lenguajes:
 :::
 
 :::{.callout-morado .column-margin}
-💡 **Tip:** En R usa `<-` para asignar variables, mientras que en Python se usa `=`.
+💡 **Tip:** En R se usa `<-` para asignar variables, mientras que en Python se usa `=`.
 :::
 
 ::: {.panel-tabset}
@@ -298,6 +298,19 @@ print(type(edad), type(altura), type(nombre), type(es_estudiante))
 ```
 :::
 
+:::{.callout-morado .column-margin}
+💡 **Tip:** En Python por medio de la función `id()` se puede obtener la dirección de memoria donde se almacena el objeto referenciado.
+
+a = [1, 2, 3]
+
+b = a  # Misma dirección de memoria
+
+b.append(4)
+
+print(a)  # Cambio de dirección en la memoria
+
+En R no existe una función base nativa directa que devuelva la dirección de memoria, sin embargo, por medio del paquete `lobstr` se puede emplear la función `obj_addr()`.
+:::
 
 ### Vectores (R) y su equivalente en Python
 
@@ -309,6 +322,26 @@ básica es la **lista**, que es heterogénea y ordenada. Cuando en Python se
 necesita un vector homogéneo con operaciones matemáticas vectorizadas (como
 en R), se usa un **array de NumPy**.
 :::
+
+
+En Python existe una convención ampliamente aceptada por la comunidad para **importar las librerías principales** de ciencia de datos y desarrollo con alias estandarizados de dos o tres letras.
+
+El objetivo de este acuerdo es mantener el código conciso, legible y uniforme entre proyectos y equipos de trabajo.
+
+| Librería | Alias | Código de Importación | Área / Uso |
+| :--- | :--- | :--- | :--- |
+| **NumPy** | `np` | `import numpy as np` | Cómputo numérico y arreglos |
+| **Pandas** | `pd` | `import pandas as pd` | Manipulación y análisis de datos |
+| **Matplotlib (Pyplot)** | `plt` | `import matplotlib.pyplot as plt` | Visualización y gráficos base |
+| **Seaborn** | `sns` | `import seaborn as sns` | Visualización estadística avanzada |
+| **TensorFlow** | `tf` | `import tensorflow as tf` | Deep learning y redes neuronales |
+| **PyTorch (Functional)** | `F` | `import torch.nn.functional as F` | Redes neuronales (submódulos) |
+| **Statsmodels (API)** | `sm` | `import statsmodels.api as sm` | Modelos estadísticos y econometría |
+| **Statsmodels (Formula)** | `smf` | `import statsmodels.formula.api as smf` | Modelos estilo R (`y ~ x`) |
+| **Polars** | `pl` | `import polars as pl` | DataFrames de alto rendimiento |
+| **OpenCV** | `cv2` | `import cv2` | Visión por computadora |
+
+
 
 ::: {.panel-tabset}
 ## R

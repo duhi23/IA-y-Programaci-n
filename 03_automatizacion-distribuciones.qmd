@@ -1,8 +1,33 @@
 ---
 title: "Tema 3: Automatización de distribuciones con R y Python"
-subtitle: "[Nombre del módulo / curso]"
-author: "[Tu nombre]"
+subtitle: "IA y Programación"
+lang: es
+author: "Diego Huaraca"
 date: last-modified
+format: 
+  live-html:
+    #embed-resources: true
+    css: styles.css
+    toc: true
+    toc-title: "Contenidos" 
+    toc-depth: 3
+    toc-location: left
+    include-in-header:
+      text: |
+        <style>
+          .logos-auspiciantes {
+            position: absolute;
+            top: 25px;
+            right: 220;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+          }
+          .logos-auspiciantes img {
+            max-height: 50px;
+            width: auto;
+          }
+        </style>
 ---
 
 ```{r}
@@ -12,17 +37,24 @@ date: last-modified
 library(reticulate)
 
 # --- Autoinstalación de paquetes de R usados en este documento ---
-paquetes_r <- c("fitdistrplus", "ggplot2", "dplyr", "MASS", "scales")
-faltantes_r <- paquetes_r[!sapply(paquetes_r, requireNamespace, quietly = TRUE)]
-if (length(faltantes_r) > 0) install.packages(faltantes_r)
-invisible(lapply(setdiff(paquetes_r, "MASS"), library, character.only = TRUE))
+#paquetes_r <- c("fitdistrplus", "ggplot2", "dplyr", "MASS", "scales")
+#faltantes_r <- paquetes_r[!sapply(paquetes_r, requireNamespace, quietly = TRUE)]
+#if (length(faltantes_r) > 0) install.packages(faltantes_r)
+#invisible(lapply(setdiff(paquetes_r, "MASS"), library, character.only = TRUE))
 # MASS se carga explícitamente por función (MASS::mvrnorm) para no chocar con dplyr::select
 
 # --- Autoinstalación de módulos de Python usados en este documento ---
-paquetes_py <- c("numpy", "pandas", "matplotlib", "seaborn", "scipy", "distfit")
-faltantes_py <- paquetes_py[!sapply(paquetes_py, py_module_available)]
-if (length(faltantes_py) > 0) py_install(faltantes_py)
+#paquetes_py <- c("numpy", "pandas", "matplotlib", "seaborn", "scipy", "distfit")
+#faltantes_py <- paquetes_py[!sapply(paquetes_py, py_module_available)]
+#if (length(faltantes_py) > 0) py_install(faltantes_py)
 ```
+
+::: {.column-margin}
+::: {.logos-auspiciantes}
+![](imgs/epn.png)
+![](imgs/puce.png)
+:::
+:::
 
 ## Motivación {.unnumbered}
 
@@ -30,13 +62,13 @@ if (length(faltantes_py) > 0) py_install(faltantes_py)
 **¿Por qué nos importa esto?**
 
 ¿Cuál es la pérdida máxima que podría tener un portafolio de inversión
-mañana, con un 95% de confianza? ¿Cuántos defectos esperar en un lote de
-producción? ¿Cuánto tiempo tardará en llegar el próximo cliente a una fila?
+mañana, con un 95% de confianza? ¿Cuántos siniestros se podrían esperar en una cartera de
+5000 pólizas de vehículos? ¿Cuánto capital debe mantener una aseguradora para respaldar miles de pólizas cuando la mortalidad futura es incierta, con un 98% de confianza?
 Estas preguntas no tienen una respuesta única y exacta: tienen una
 **distribución de posibles resultados**. La simulación nos permite generar
 miles de escenarios posibles en segundos y responder preguntas de riesgo e
-incertidumbre que serían muy difíciles —o imposibles— de resolver con
-álgebra pura. En este tema aprenderás a simular variables aleatorias, a
+incertidumbre que serían muy difíciles de resolver con
+álgebra pura. En este tema el estudiante aprenderá a simular variables aleatorias, a
 automatizar el ajuste de una distribución a datos reales, y a aplicar todo
 esto en una de las herramientas más usadas en finanzas: el cálculo del
 **Value at Risk (VaR)** mediante simulación Montecarlo.
@@ -54,11 +86,150 @@ Al finalizar este tema, el estudiante será capaz de:
 - Calcular el Value at Risk (VaR) de un portafolio mediante simulación
   Montecarlo.
 
-## 1. Simulación de variables aleatorias discretas
+## Número pseudoaleatorios y semillas
 
 ::: {.teoria}
-Una variable aleatoria **discreta** toma un conjunto contable de valores
-(p. ej. 0, 1, 2, 3...). Dos de las más usadas:
+La generación de variables aleatorias discretas y continuas dependen directamente de una fuente primaria: los **números pseudoaleatorios** (PRNG, por sus siglas en inglés), que son **algoritmos deterministas** definidos por relaciones de recurrencia que producen secuencias numéricas cuyas propiedades estadísticas resultan indistinguibles de una secuencia genuinamente aleatoria.
+
+El punto de partida teórico para la generación de números pseudoaleatorios es el Generador Congruencial Lineal (LCG). Se define mediante la ecuación en diferencias:
+$$X_{n+1} = (a\cdot X_n + c) \mod m$$
+donde:
+
+  - $X_0$ es la semilla $(X_0 \geq 0)$.
+  - $a$ es el multiplicador $(a > 0)$.
+  - $c$ es el incremento $(c \geq 0)$.
+  - $m$ es el módulo $(m > 0)$.
+
+Para obtener una variable en el intervalo $(0,1)$, se normaliza el entero obtenido:
+$$U_n = \frac{X_n}{m}$$
+El período máximo de un LCG es $m$.
+:::
+
+:::{.callout-morado .column-margin}
+En la modelización actuarial y financiera, la reproducibilidad es un requisito crítico. Permite auditabilidad de modelos de riesgo, validación de resultados por terceros y depuración de código. Fijar la semilla inicial determina la secuencia exacta de variables aleatorias generadas.
+:::
+
+
+### Ejercicios resueltos
+
+::: {.ejercicio-resuelto}
+
+**Ejercicio 1:** Considere un Generador Congruencial Lineal (LCG) definido por la siguiente relación de recurrencia:
+$$X_{n+1} = (7\cdot X_n + 3) \mod 16$$
+con una semilla inicial $X_0 = 5$. Se pide:
+
+  a. Calcular los primeros 5 valores enteros de la secuencia: $X_1, X_2, X_3, X_4, X_5$.
+  b. Obtener los correspondientes valores pseudoaleatorios uniformes $U_1, U_2, U_3, U_4, U_5\in U(0,1)$ 
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: resuelto0-r
+# Vector que almacena los resultados
+X <- numeric(6)
+# Semilla
+X[1] <- 5
+# Secuencia iterativa
+for(i in 2:6) {
+  X[i] <- (7 * X[i-1] + 3) %% 16
+}
+# Resultados enteros
+X[-1]
+# Números pseudoaleatorios uniformes
+U <- X[-1] / 16
+U
+```
+
+## Python
+
+```{python}
+#| label: resuelto0-py
+import numpy as np
+# Vector que almacena los resultados
+X = np.zeros(6, dtype=int)
+# Semilla
+X[0] = 5
+# Secuencia iterativa
+for i in range(1, 6):
+    X[i] = (7 * X[i-1] + 3) % 16
+# Resultados enteros
+X[1:]
+# Números pseudoaleatorios uniformes
+U = X[1:] / 16
+U
+```
+:::
+
+:::
+
+### Ejercicios propuestos
+
+::: {.ejercicio-propuesto}
+
+**Ejercicio 1:** Una firma de consultoría actuarial utiliza un Generador Congruencial Combinado constituido por dos componentes individuales $LCG_1$ y $LCG_2$ definidos por las siguientes relaciones:
+
+  - Componente 1 $(LCG_1)$:
+$$X_{1,n+1} = (40014\cdot X_{1,n})\quad \text{ mod }\quad  2147483563$$
+  - Componente 2 $(LCG_2)$:
+  $$X_{2,n+1} = (40692\cdot X_{2,n})\quad \text{ mod }\quad  2147483399$$
+  La combinación de ambos componentes para obtener el valor uniforme $U_n​\in (0,1)$ sigue la regla:
+  $$Z_n = (X_{1,n} - X_{2,n})\quad \text{ mod }\quad (m_1 - 1)$$
+  $$U_n = \begin{cases} 
+  \frac{Z_n}{m_1} & \text{ si } Z_n > 0 \\
+  \frac{m_1 - 1}{m_1} & \text{ si } Z_n = 0
+  \end{cases}$$
+  donde $m_1 = 2147483563$.
+
+  Dados los estados iniciales $X_{1,0}=12345$ y $X_{2,0}=67890$, se pide calcular los primeros 5 valores de la secuencia $U_1, U_2, U_3, U_4, U_5$. 
+
+::: {.panel-tabset}
+## R
+```{webr}
+#| label: propuesto0-r
+
+# Completa aquí tu solución en R
+```
+
+## Python
+```{pyodide-python}
+#| label: propuesto0-py
+
+# Completa aquí tu solución en Python
+```
+:::
+:::
+
+A pesar de la amplia diversidad de algoritmos diseñados para la generación de números pseudoaleatorios, cada uno con sus **propias complejidades matemáticas**, estructuras recursivas y propiedades estadísticas, la práctica computacional moderna **no requiere reimplementar** estas fórmulas desde cero. Tanto R como Python integran generadores de alto rendimiento y comprobada solidez técnica mediante comandos directos y altamente optimizados (como `runif()` en R o la suite `numpy.random` en Python). 
+
+::: {.panel-tabset}
+## R
+```{webr}
+#| label: propuesto00-r
+# Semilla
+set.seed(12345)
+# 10 números aleatorios uniformes en (0,1)
+runif(10)
+```
+
+## Python
+```{pyodide-python}
+#| label: propuesto00-py
+import numpy as np
+# Semilla
+rng = np.random.default_rng(12345)
+# 10 números aleatorios uniformes en (0,1)
+print(rng.uniform(0, 1, 10))
+```
+:::
+
+
+
+## Simulación de variables aleatorias discretas
+
+::: {.teoria}
+Una variable aleatoria **discreta** toma un conjunto finito o contable de valores
+(p. ej. 0, 1, 2, 3...). En la modelización del riesgo actuarial, estas distribuciones son fundamentales para evaluar principalmente la frecuencia de siniestros y el conteo de eventos. Dos de las más usadas:
 
 - **Binomial** — número de éxitos en $n$ ensayos independientes con
   probabilidad de éxito $p$ (p. ej. artículos defectuosos en un lote).
@@ -77,9 +248,11 @@ set.seed(42)
 
 # Binomial: 100 lotes de 20 artículos, prob. de defecto = 0.05
 defectos <- rbinom(n = 100, size = 20, prob = 0.05)
+defectos
 
 # Poisson: 100 horas, tasa promedio de 4 llamadas/hora
 llamadas <- rpois(n = 100, lambda = 4)
+llamadas
 
 mean(defectos); mean(llamadas)
 
@@ -104,9 +277,11 @@ rng = np.random.default_rng(42)
 
 # Binomial: 100 lotes de 20 artículos, prob. de defecto = 0.05
 defectos = rng.binomial(n=20, p=0.05, size=100)
+defectos
 
 # Poisson: 100 horas, tasa promedio de 4 llamadas/hora
 llamadas = rng.poisson(lam=4, size=100)
+llamadas
 
 defectos.mean(), llamadas.mean()
 
@@ -123,9 +298,8 @@ plt.show()
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 1
 
-**Enunciado:** Se producen lotes de 50 piezas con una probabilidad de
+**Ejercicio 1:** Se producen lotes de 50 piezas con una probabilidad de
 defecto de 2% por pieza. Simula 1000 lotes y estima (empíricamente) la
 probabilidad de que un lote tenga más de 3 piezas defectuosas. Compara con
 el valor teórico.
@@ -178,9 +352,8 @@ ambas.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 1
 
-Un centro de atención recibe en promedio 6 solicitudes por hora (Poisson).
+**Ejercicio 1:** Un centro de atención recibe en promedio 6 solicitudes por hora (Poisson).
 Simula 2000 horas y estima la probabilidad de que en una hora se reciban
 0 solicitudes, y la probabilidad de recibir más de 10.
 
@@ -203,7 +376,7 @@ Simula 2000 horas y estima la probabilidad de que en una hora se reciban
 :::
 :::
 
-## 2. Simulación de variables aleatorias continuas
+## Simulación de variables aleatorias continuas
 
 ::: {.teoria}
 Una variable aleatoria **continua** puede tomar cualquier valor dentro de
@@ -268,9 +441,8 @@ código entre lenguajes.
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 2
 
-**Enunciado:** El peso de un producto empacado sigue una distribución
+**Ejemplo 2:** El peso de un producto empacado sigue una distribución
 normal con media 500 g y desviación estándar 8 g. La especificación de
 calidad exige que el peso esté entre 485 g y 515 g. Simula 2000 productos y
 estima qué porcentaje cumple la especificación.
@@ -310,9 +482,8 @@ directamente contando cuántas observaciones simuladas cumplen la condición.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 2
 
-El tiempo de atención en una ventanilla sigue una distribución exponencial
+**Ejercicio 2:** El tiempo de atención en una ventanilla sigue una distribución exponencial
 con media de 4 minutos. Simula 1000 atenciones y estima la probabilidad de
 que una atención tome más de 10 minutos. Verifica tu resultado empírico
 contra el valor teórico usando la función de distribución acumulada.
@@ -336,7 +507,7 @@ contra el valor teórico usando la función de distribución acumulada.
 :::
 :::
 
-## 3. Ajuste automático de distribuciones ("agentes" de ajuste)
+## Ajuste automático de distribuciones ("agentes" de ajuste)
 
 ::: {.teoria}
 En la práctica no siempre sabemos de antemano qué distribución sigue un
@@ -354,7 +525,7 @@ librería `fitdistrplus` cumple este rol; en Python, la librería `distfit`.
 
 ```{r}
 #| label: ajuste-r
-
+library(fitdistrplus)
 set.seed(3)
 # Datos simulados a partir de una exponencial "desconocida" (finge que son datos reales)
 datos_reales <- rexp(300, rate = 1/6)
@@ -408,9 +579,8 @@ probadas.
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 3
 
-**Enunciado:** Genera 400 datos a partir de una distribución gamma con
+**Ejemplo 3:** Genera 400 datos a partir de una distribución gamma con
 `shape = 2` y `rate = 0.5` (fingiendo que son datos reales desconocidos).
 Usa el ajuste automático para identificar la mejor distribución candidata
 entre exponencial, normal y gamma, y verifica si recupera los parámetros
@@ -463,33 +633,30 @@ distribución subyacente cuando se le dan suficientes datos.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 3
 
-Genera 500 datos a partir de una distribución log-normal (`rlnorm()` en R /
+**Ejercicio 3:** Genera 500 datos a partir de una distribución log-normal (`rlnorm()` en R /
 `rng.lognormal()` en Python) con los parámetros que prefieras. Usa el
 ajuste automático probando al menos 4 distribuciones candidatas
 (incluyendo log-normal) y reporta cuál obtiene el mejor puntaje.
 
 ::: {.panel-tabset}
 ## R
-```{r}
+```{webr}
 #| label: propuesto3-r
-#| eval: false
 
 # Completa aquí tu solución en R
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto3-py
-#| eval: false
 
 # Completa aquí tu solución en Python
 ```
 :::
 :::
 
-## 4. IA generativa y simulación Montecarlo
+## IA generativa y simulación Montecarlo
 
 ::: {.teoria}
 ### La conexión entre Montecarlo e IA generativa
@@ -606,9 +773,8 @@ tomar el percentil inferior, que corresponde a los peores escenarios).
 ### Ejercicios resueltos
 
 ::: {.ejercicio-resuelto}
-#### Ejercicio resuelto 4
 
-**Enunciado:** Para el mismo portafolio del ejemplo anterior, calcula el
+**Ejemplo 4:** Para el mismo portafolio del ejemplo anterior, calcula el
 VaR a 95% para un horizonte de **10 días** (no 1 día), asumiendo que los
 retornos diarios son independientes. (Pista: los retornos a $n$ días se
 pueden aproximar escalando la volatilidad por $\sqrt{n}$ — la "regla de la
@@ -673,9 +839,8 @@ consecutivos.
 ### Ejercicios propuestos
 
 ::: {.ejercicio-propuesto}
-#### Ejercicio propuesto 4
 
-Recalcula el VaR al 95% y al 99% para el portafolio original (horizonte de
+**Ejercicio 4:** Recalcula el VaR al 95% y al 99% para el portafolio original (horizonte de
 1 día), pero usando la distribución **t de Student** en lugar de la normal
 (la t tiene colas más pesadas, lo cual suele ser más realista para
 retornos financieros). Compara los resultados con los del ejemplo original
@@ -683,9 +848,8 @@ y comenta qué distribución da un VaR más conservador (más alto) y por qué.
 
 ::: {.panel-tabset}
 ## R
-```{r}
+```{webr}
 #| label: propuesto4-r
-#| eval: false
 
 # Pista: rt(n, df) genera valores de una t con "df" grados de libertad;
 # deberás reescalar para que tenga la volatilidad deseada.
@@ -694,9 +858,9 @@ y comenta qué distribución da un VaR más conservador (más alto) y por qué.
 ```
 
 ## Python
-```{python}
+```{pyodide-python}
 #| label: propuesto4-py
-#| eval: false
+
 
 # Pista: rng.standard_t(df, size=n) genera valores de una t con "df"
 # grados de libertad; deberás reescalar para que tenga la volatilidad deseada.

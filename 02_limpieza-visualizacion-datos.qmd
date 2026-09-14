@@ -6,7 +6,7 @@ author: "Diego Huaraca"
 date: last-modified
 format: 
   live-html:
-    embed-resources: true
+    #embed-resources: true
     css: styles.css
     toc: true
     toc-title: "Contenidos" 

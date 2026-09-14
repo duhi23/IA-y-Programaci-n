@@ -205,7 +205,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Fecha de publicación</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">1 de septiembre de 2026</p>
+      <p class="date">14 de septiembre de 2026</p>
     </div>
   </div>
   
@@ -431,7 +431,7 @@ window.Quarto = {
 </div>
 
 <div class="no-row-height column-margin column-container"><div class="callout-morado">
-<p>💡 <strong>Tip:</strong> En R usa <code>&lt;-</code> para asignar variables, mientras que en Python se usa <code>=</code>.</p>
+<p>💡 <strong>Tip:</strong> En R se usa <code>&lt;-</code> para asignar variables, mientras que en Python se usa <code>=</code>.</p>
 </div></div><div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
@@ -472,12 +472,100 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</section>
+
+<div class="no-row-height column-margin column-container"><div class="callout-morado">
+<p>💡 <strong>Tip:</strong> En Python por medio de la función <code>id()</code> se puede obtener la dirección de memoria donde se almacena el objeto referenciado.</p>
+<p>a = [1, 2, 3]</p>
+<p>b = a # Misma dirección de memoria</p>
+<p>b.append(4)</p>
+<p>print(a) # Cambio de dirección en la memoria</p>
+<p>En R no existe una función base nativa directa que devuelva la dirección de memoria, sin embargo, por medio del paquete <code>lobstr</code> se puede emplear la función <code>obj_addr()</code>.</p>
+</div></div></section>
 <section id="vectores-r-y-su-equivalente-en-python" class="level3">
 <h3 class="anchored" data-anchor-id="vectores-r-y-su-equivalente-en-python">Vectores (R) y su equivalente en Python</h3>
 <div class="teoria">
 <p>En <strong>R</strong>, el vector (<code>c()</code>) es la estructura fundamental: una colección <strong>homogénea</strong> (todos los elementos del mismo tipo) y es la base de casi todo en el lenguaje. <strong>Python no tiene un tipo “vector” nativo</strong>; su estructura básica es la <strong>lista</strong>, que es heterogénea y ordenada. Cuando en Python se necesita un vector homogéneo con operaciones matemáticas vectorizadas (como en R), se usa un <strong>array de NumPy</strong>.</p>
 </div>
+<p>En Python existe una convención ampliamente aceptada por la comunidad para <strong>importar las librerías principales</strong> de ciencia de datos y desarrollo con alias estandarizados de dos o tres letras.</p>
+<p>El objetivo de este acuerdo es mantener el código conciso, legible y uniforme entre proyectos y equipos de trabajo.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Librería</th>
+<th style="text-align: left;">Alias</th>
+<th style="text-align: left;">Código de Importación</th>
+<th style="text-align: left;">Área / Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>NumPy</strong></td>
+<td style="text-align: left;"><code>np</code></td>
+<td style="text-align: left;"><code>import numpy as np</code></td>
+<td style="text-align: left;">Cómputo numérico y arreglos</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Pandas</strong></td>
+<td style="text-align: left;"><code>pd</code></td>
+<td style="text-align: left;"><code>import pandas as pd</code></td>
+<td style="text-align: left;">Manipulación y análisis de datos</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Matplotlib (Pyplot)</strong></td>
+<td style="text-align: left;"><code>plt</code></td>
+<td style="text-align: left;"><code>import matplotlib.pyplot as plt</code></td>
+<td style="text-align: left;">Visualización y gráficos base</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Seaborn</strong></td>
+<td style="text-align: left;"><code>sns</code></td>
+<td style="text-align: left;"><code>import seaborn as sns</code></td>
+<td style="text-align: left;">Visualización estadística avanzada</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>TensorFlow</strong></td>
+<td style="text-align: left;"><code>tf</code></td>
+<td style="text-align: left;"><code>import tensorflow as tf</code></td>
+<td style="text-align: left;">Deep learning y redes neuronales</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>PyTorch (Functional)</strong></td>
+<td style="text-align: left;"><code>F</code></td>
+<td style="text-align: left;"><code>import torch.nn.functional as F</code></td>
+<td style="text-align: left;">Redes neuronales (submódulos)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Statsmodels (API)</strong></td>
+<td style="text-align: left;"><code>sm</code></td>
+<td style="text-align: left;"><code>import statsmodels.api as sm</code></td>
+<td style="text-align: left;">Modelos estadísticos y econometría</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Statsmodels (Formula)</strong></td>
+<td style="text-align: left;"><code>smf</code></td>
+<td style="text-align: left;"><code>import statsmodels.formula.api as smf</code></td>
+<td style="text-align: left;">Modelos estilo R (<code>y ~ x</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Polars</strong></td>
+<td style="text-align: left;"><code>pl</code></td>
+<td style="text-align: left;"><code>import polars as pl</code></td>
+<td style="text-align: left;">DataFrames de alto rendimiento</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OpenCV</strong></td>
+<td style="text-align: left;"><code>cv2</code></td>
+<td style="text-align: left;"><code>import cv2</code></td>
+<td style="text-align: left;">Visión por computadora</td>
+</tr>
+</tbody>
+</table>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
