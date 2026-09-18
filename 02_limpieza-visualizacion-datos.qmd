@@ -415,10 +415,9 @@ ventas |> select(-mes, -region) |> tail(, n=6)
 
 ```{python}
 #| label: select-py
-import polars as pl
-ventas.select(["fecha", "region", "precio_unitario"]).tail(6)
+ventas.loc[:, ["fecha", "region", "precio_unitario"]].tail(6)
 
-ventas.drop(["mes", "region"]).tail(6)
+ventas.drop(columns=["mes", "region"]).tail(6)
 ```
 :::
 
@@ -435,6 +434,15 @@ ventas |> dplyr::filter(unidades > 50)
 
 ventas |> dplyr::filter(region == "Norte" & ingreso <= 5000)
 ```
+
+## Python
+
+```{python}
+#| label: filter-py
+ventas.query("unidades > 50")
+
+ventas.query("region == 'Norte' and ingreso <= 5000")
+```
 :::
 
 ### `mutate()`: Creación y transformación de variables
@@ -449,6 +457,15 @@ Añade nuevas columnas o modifica las existentes **manteniendo la dimensión ori
 ventas |> mutate(menos_10_unidades = ifelse(unidades < 10, "SI", "NO")) |> head(6)
 
 ventas |> mutate(ingreso = round(ingreso/1000, 2)) |> tail(6) # ingreso expresado en miles
+```
+
+## Python
+
+```{python}
+#| label: mutate-py
+ventas.assign(menos_10_unidades=np.where(ventas["unidades"] < 10, "SI", "NO")).head(6)
+
+ventas.assign(ingreso=(ventas["ingreso"] / 1000).round(2)).tail(6)
 ```
 :::
 
@@ -465,6 +482,15 @@ ventas |> arrange(ingreso) |> head(10) # Top 10 en menos ventas
 
 ventas |> arrange(desc(ingreso)) |> head(10) # Top 10 en más ventas
 ```
+
+## Python
+
+```{python}
+#| label: arrange-py
+ventas.sort_values(by="ingreso").head(10)
+
+ventas.sort_values(by="ingreso", ascending=False).head(10)
+```
 :::
 
 
@@ -480,6 +506,20 @@ Consolida múltiples valores de un grupo completo a un único escalar descriptiv
 ventas |> group_by(region) |> summarise(Total_Ingresos = sum(ingreso))
 
 ventas |> group_by(region, mes) |> summarise(Total_Ingresos = mean(ingreso), Num_Ventas = n()) |> head(8)
+```
+
+## Python
+
+```{python}
+#| label: summarise-py
+ventas.groupby(["region"], as_index=False).agg(
+    Total_Ingresos=("ingreso", "sum")
+).head(8)
+
+ventas.groupby(["region", "mes"], as_index=False).agg(
+    Total_Ingresos=("ingreso", "mean"),
+    Num_Ventas=("ingreso", "count")
+).head(8)
 ```
 :::
 
