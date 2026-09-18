@@ -249,9 +249,9 @@ faltantes (`NA`/`NaN`), crear flags y valores atípicos.
 ```{r}
 #| label: numeros-r
 
-n <- 1234567.891
+n <- 12345.67891
 
-round(n, 1)
+round(n, 2)
 format(n, big.mark = ",", scientific = FALSE)
 scales::dollar(n)
 scales::percent(0.256, accuracy = 0.1)
@@ -361,6 +361,114 @@ directa de una sola línea, tanto con `aggregate()` en R como con
 ```
 :::
 :::
+
+### Operadores Pipes: |> vs. %>%
+
+::: {.teoria}
+El flujo de trabajo analítico en R se basa fundamentalmente en la **concatenación de transformaciones sucesivas** sobre conjuntos de datos. Para evitar la anidación excesiva de funciones o la creación de objetos intermedios **innecesarios**, se utilizan los operadores de tubería (pipes). Estos operadores toman el resultado del lado izquierdo y lo pasan como el primer argumento de la función ubicada en el lado derecho.
+
+En R existen dos implementaciones principales:
+
+  - El pipe nativo (`|>`): Introducido a partir de la versión 4.1.0. Es un operador integrado directamente en la sintaxis del lenguaje R (base), lo que elimina cualquier dependencia de paquetes externos y optimiza el rendimiento de ejecución.
+  - El pipe del paquete magrittr (`%>%`): Popularizado masivamente a través del ecosistema `tidyverse` (especialmente con `dplyr`).
+:::
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: pipe-r
+c(2,5,12,9,10,7,8) |> mean()
+c(2,5,12,9,10,7,8) %>% mean    # Permite omitir paréntesis de las funciones
+
+ventas |> head(3)
+ventas %>% head(3)
+```
+:::
+
+
+### Operaciones con los verbos de dplyr
+
+::: {.teoria}
+El paquete `dplyr` en R proporciona una gramática consistente para la manipulación de datos. Las transformaciones tabulares se estructuran mediante cinco verbos fundamentales que ejecutan acciones específicas sobre filas o columnas.
+:::
+
+#### `select()`: Selección y reordenamiento de columnas
+
+Permite aislar, reordenar o renombrar variables en una estructura tabular mediante su nombre explícito.
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: select-r
+ventas |> select(fecha, region, precio_unitario) |> tail(, n=6)
+
+ventas |> select(-mes, -region) |> tail(, n=6)
+```
+:::
+
+### `filter()`: Filtrado de observaciones (filas)
+
+Filtra observaciones basadas en **condiciones lógicas o relacionales**. Conserva únicamente las filas donde la expresión dada evalúa a `TRUE`.
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: filter-r
+ventas |> dplyr::filter(unidades > 50)
+
+ventas |> dplyr::filter(region == "Norte" & ingreso <= 5000)
+```
+:::
+
+### `mutate()`: Creación y transformación de variables
+
+Añade nuevas columnas o modifica las existentes **manteniendo la dimensión original** de filas. Opera de manera vectorizada fila por fila o sobre el vector completo.
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: mutate-r
+ventas |> mutate(menos_10_unidades = ifelse(unidades < 10, "SI", "NO")) |> head(6)
+
+ventas |> mutate(ingreso = round(ingreso/1000, 2)) |> tail(6) # ingreso expresado en miles
+```
+:::
+
+### `arrange()`: Ordenamiento de observaciones
+
+Reordena las filas según los valores **de una o más columnas**, de forma **ascendente** (por defecto) o descendente utilizando la función `desc()`.
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: arrange-r
+ventas |> arrange(ingreso) |> head(10) # Top 10 en menos ventas
+
+ventas |> arrange(desc(ingreso)) |> head(10) # Top 10 en más ventas
+```
+:::
+
+
+### `summarise()`: Agregación y resumen
+
+Consolida múltiples valores de un grupo completo a un único escalar descriptivo (como la media, desviación estándar o conteos). Generalmente se combina con la función `group_by()` para realizar agregaciones grupales.
+
+::: {.panel-tabset}
+## R
+
+```{r}
+#| label: summarise-r
+ventas |> group_by(region) |> summarise(Total_Ingresos = sum(ingreso))
+
+ventas |> group_by(region, mes) |> summarise(Total_Ingresos = mean(ingreso), Num_Ventas = n()) |> head(8)
+```
+:::
+
 
 ## Gráficos estáticos de alta calidad
 

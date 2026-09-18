@@ -85,9 +85,15 @@ execute:
 ::: incremental
 -   [**Ejercicios propuestos**]{.hl-red} → `{Actividad Grupal - 3 integrantes}` → 30%.
 
+    **Fecha límite de entrega:** Domingo 20 de septiembre, 23:59 hrs.
+
 -   [**Informe Estadístico**]{.hl-red} → `{Actividad Grupal - 3 integrantes}` → 30%.
 
+    **Fecha límite de entrega:** Miércoles 23 de septiembre, 18:00 hrs.
+
 -   [**Examen final**]{.hl-yellow}  → `{Actividad individual}` → 40%.
+
+    **Fecha:** Martes 22 de septiembre. La evaluación se habilitará en el aula virtual del curso en el horario de 18:00 a 22:00. (La evaluación tiene una duración de 60 minutos).
 
 :::
 :::
