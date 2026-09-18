@@ -393,6 +393,10 @@ ventas %>% head(3)
 El paquete `dplyr` en R proporciona una gramática consistente para la manipulación de datos. Las transformaciones tabulares se estructuran mediante cinco verbos fundamentales que ejecutan acciones específicas sobre filas o columnas.
 :::
 
+:::{.callout-morado .column-margin}
+💡 **Tip:** La sintaxis equivalente en Python para cada uno de los verbos de `dplyr` en R se puede generar utilizando `polars`, que se alinea estrechamente con la filosofía de tuberías.
+:::
+
 #### `select()`: Selección y reordenamiento de columnas
 
 Permite aislar, reordenar o renombrar variables en una estructura tabular mediante su nombre explícito.
@@ -405,6 +409,16 @@ Permite aislar, reordenar o renombrar variables en una estructura tabular median
 ventas |> select(fecha, region, precio_unitario) |> tail(, n=6)
 
 ventas |> select(-mes, -region) |> tail(, n=6)
+```
+
+## Python
+
+```{python}
+#| label: select-py
+import polars as pl
+ventas.select(["fecha", "region", "precio_unitario"]).tail(6)
+
+ventas.drop(["mes", "region"]).tail(6)
 ```
 :::
 
