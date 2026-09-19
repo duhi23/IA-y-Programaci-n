@@ -210,6 +210,8 @@ A pesar de la amplia diversidad de algoritmos diseñados para la generación de 
 set.seed(12345)
 # 10 números aleatorios uniformes en (0,1)
 runif(10)
+# Histograma de 1000 números aleatorios uniformes en (0,1)
+hist(runif(1000), main = "Distribución números aleatorios", col = "#39c5bb", xlab ="")
 ```
 
 ## Python
@@ -220,10 +222,33 @@ import numpy as np
 rng = np.random.default_rng(12345)
 # 10 números aleatorios uniformes en (0,1)
 print(rng.uniform(0, 1, 10))
+# Histograma de 1000 números aleatorios uniformes en (0,1)
+plt.hist(np.random.uniform(0, 1, 1000), color="#39c5bb", edgecolor="black")
+plt.title("Distribución números aleatorios")
+plt.xlabel("")
+plt.show()
 ```
 :::
 
+::: {.panel-tabset}
+## R
+```{r}
+#| label: propuesto000-r
+# Histograma de 10000 números aleatorios uniformes en (0,1)
+hist(runif(10000), main = "Distribución números aleatorios", col = "#39c5bb", xlab ="")
+```
 
+## Python
+```{python}
+#| label: propuesto000-py
+# Histograma de 10000 números aleatorios uniformes en (0,1)
+import matplotlib.pyplot as plt 
+plt.hist(np.random.uniform(0, 1, 10000), color="#39c5bb", edgecolor="black")
+plt.title("Distribución números aleatorios")
+plt.xlabel("")
+plt.show()
+```
+:::
 
 ## Simulación de variables aleatorias discretas
 
@@ -304,7 +329,7 @@ defecto de 2% por pieza. Simula 1000 lotes y estima (empíricamente) la
 probabilidad de que un lote tenga más de 3 piezas defectuosas. Compara con
 el valor teórico.
 
-**Solución razonada:** Simulamos 1000 observaciones de una binomial
+**Solución:** Simulamos 1000 observaciones de una binomial
 $(n=50, p=0.02)$, contamos qué proporción supera el umbral (probabilidad
 empírica) y la comparamos contra `1 - pbinom(3, 50, 0.02)` (probabilidad
 teórica exacta).
@@ -323,6 +348,12 @@ prob_teorica  <- 1 - pbinom(3, size = 50, prob = 0.02)
 
 cat("Probabilidad empírica:", prob_empirica, "\n")
 cat("Probabilidad teórica :", round(prob_teorica, 4), "\n")
+
+# Convergencia de la probabilidad empírica
+plot(1:2000, sapply(1:2000, 
+function(k){mean(rbinom(k, size = 50, prob = 0.02) > 3)}), 
+xlab = "Simulaciones", ylab = "Probabilidad", type = "l")
+abline(h=0.02, col ="red", ylim = c(0,0.25))
 ```
 
 ## Python
@@ -340,6 +371,23 @@ prob_teorica  = 1 - binom.cdf(3, n=50, p=0.02)
 
 print("Probabilidad empírica:", prob_empirica)
 print("Probabilidad teórica :", round(prob_teorica, 4))
+
+
+# Convergencia de la probabilidad empírica
+import matplotlib.pyplot as plt
+import numpy as np
+
+k_vals = np.arange(1, 2001)
+prob_empirica = [
+    np.mean(np.random.binomial(n=50, p=0.02, size=k) > 3) 
+    for k in k_vals
+]
+plt.plot(k_vals, prob_empirica, color="#1f77b4", linewidth=1)
+plt.axhline(y=0.02, color="red")
+plt.ylim(0, 0.25)
+plt.xlabel("Simulaciones")
+plt.ylabel("Probabilidad")
+plt.show()
 ```
 :::
 
@@ -380,7 +428,7 @@ Simula 2000 horas y estima la probabilidad de que en una hora se reciban
 
 ::: {.teoria}
 Una variable aleatoria **continua** puede tomar cualquier valor dentro de
-un rango. Tres de las más usadas:
+un rango. Tres de las distribuciones más usadas son:
 
 - **Uniforme** — todos los valores en un rango son igualmente probables.
 - **Normal** — datos simétricos alrededor de una media, con forma de
@@ -431,8 +479,8 @@ plt.show()
 ```
 :::
 
-::: {.callout-objetivo}
-Nota de parametrización: en R, `rexp()` usa la **tasa** (`rate = 1/media`);
+:::{.callout-morado .column-margin}
+💡 **Tip:** En R, `rexp()` usa la **tasa** (`rate = 1/media`);
 en Python/NumPy, `rng.exponential()` usa directamente la **escala**
 (`scale = media`). Es un error común confundir ambos parámetros al migrar
 código entre lenguajes.
@@ -507,14 +555,14 @@ contra el valor teórico usando la función de distribución acumulada.
 :::
 :::
 
-## Ajuste automático de distribuciones ("agentes" de ajuste)
+## Ajuste automático de distribuciones
 
 ::: {.teoria}
 En la práctica no siempre sabemos de antemano qué distribución sigue un
 conjunto de datos reales: hay que **ajustarla**. Existen herramientas que
-automatizan este proceso —prueban varias distribuciones candidatas,
+automatizan este proceso prueban varias distribuciones candidatas,
 estiman sus parámetros por máxima verosimilitud, y las comparan con
-criterios estadísticos (AIC, BIC, pruebas de bondad de ajuste)— actuando
+criterios estadísticos (AIC, BIC, pruebas de bondad de ajuste) actuando
 como un "agente" que explora el espacio de distribuciones posibles sin que
 el analista tenga que programar cada prueba manualmente. En R, la
 librería `fitdistrplus` cumple este rol; en Python, la librería `distfit`.
@@ -626,7 +674,7 @@ dfit2.model["name"], dfit2.model["params"]
 **Interpretación del resultado:** El AIC más bajo debería corresponder a la
 distribución gamma (la que realmente generó los datos), y los parámetros
 estimados deberían acercarse a `shape=2` y `rate=0.5` (o su equivalente en
-`scale`), confirmando que el "agente" de ajuste recupera correctamente la
+`scale`), confirmando que el ajuste recupera correctamente la
 distribución subyacente cuando se le dan suficientes datos.
 :::
 
@@ -656,11 +704,9 @@ ajuste automático probando al menos 4 distribuciones candidatas
 :::
 :::
 
-## IA generativa y simulación Montecarlo
+## Simulación Montecarlo
 
 ::: {.teoria}
-### La conexión entre Montecarlo e IA generativa
-
 La **simulación Montecarlo** consiste en generar un gran número de
 escenarios aleatorios a partir de una distribución (conocida o ajustada)
 para aproximar la distribución de un resultado incierto, cuando resolverlo
@@ -764,8 +810,8 @@ plt.show()
 ```
 :::
 
-::: {.callout-objetivo}
-Nota de signos: por convención el VaR se reporta como un número
+:::{.callout-morado .column-margin}
+💡 **Tip:** Por convención el VaR se reporta como un número
 **positivo** que representa una pérdida (por eso el signo negativo al
 tomar el percentil inferior, que corresponde a los peores escenarios).
 :::

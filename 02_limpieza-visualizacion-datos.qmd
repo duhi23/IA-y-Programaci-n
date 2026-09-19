@@ -916,3 +916,4 @@ conteo antes de graficar.)
 - Documentación de `lubridate`: <https://lubridate.tidyverse.org/>
 - Documentación de `plotly` para R: <https://plotly.com/r/>
 - Documentación de `plotly` para Python: <https://plotly.com/python/>
+- Documentación de `data.table` para R: <https://atrebas.github.io/post/2019-03-03-datatable-dplyr/>
